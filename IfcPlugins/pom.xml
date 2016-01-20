@@ -7,16 +7,18 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<description>BIMserver plugin that provides IFC serializers/deserializers</description>
-	<build>
+		<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
-				<directory>src</directory>
+				<targetPath>plugin</targetPath>
+				<directory>plugin</directory>
 			</resource>
 		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -35,23 +37,16 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
 				<configuration>
-					<additionalparam>-Xdoclint:none</additionalparam>
+					<project.scm.id>github.com</project.scm.id>
+					<checkModificationExcludes>
+						<checkModificationExclude>IfcPlugins/pom.xml</checkModificationExclude>
+					</checkModificationExcludes>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -85,9 +80,6 @@
 								<goals>
 									<goal>jar</goal>
 								</goals>
-								<configuration>
-									<additionalparam>-Xdoclint:none</additionalparam>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
