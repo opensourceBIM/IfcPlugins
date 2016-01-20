@@ -7,7 +7,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<description>BIMserver plugin that provides IFC serializers/deserializers</description>
-		<build>
+	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
