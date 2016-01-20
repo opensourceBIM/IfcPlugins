@@ -3,7 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>IfcPlugins</artifactId>
 	<groupId>org.opensourcebim</groupId>
-	<version>1.5.8-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<description>BIMserver plugin that provides IFC serializers/deserializers</description>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
@@ -57,18 +61,18 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>PluginBase</artifactId>
-			<version>1.5.8-SNAPSHOT</version>
+			<version>1.5.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>Shared</artifactId>
-			<version>1.5.8-SNAPSHOT</version>
+			<version>1.5.8</version>
 		</dependency>
 	</dependencies>
 	<scm>
-		<url>https://github.com/opensourceBIM/BIMserver.git</url>
-		<connection>scm:git:https://github.com/opensourceBIM/BIMserver.git</connection>
-		<developerConnection>scm:git:https://github.com/opensourceBIM/BIMserver.git</developerConnection>
+		<url>https://github.com/opensourceBIM/IfcPlugins.git</url>
+		<connection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</connection>
+		<developerConnection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</developerConnection>
 	</scm>
 	<organization>
 		<name>OpenSource BIM</name>
@@ -76,10 +80,10 @@
 	</organization>
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/opensourceBIM/BIMserver/issues</url>
+		<url>https://github.com/opensourceBIM/IfcPlugins/issues</url>
 	</issueManagement>
 	<name>IfcPlugins</name>
-	<url>https://github.com/opensourceBIM/BIMserver</url>
+	<url>https://github.com/opensourceBIM/IfcPlugins/BIMserver</url>
 	<licenses>
 		<license>
 			<name>GNU Affero General Public License</name>
