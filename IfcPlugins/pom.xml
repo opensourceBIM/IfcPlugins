@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>IfcPlugins</artifactId>
 	<groupId>org.opensourcebim</groupId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<description>BIMserver plugin that provides IFC serializers/deserializers</description>
-	<build>
+		<build>
 		<sourceDirectory>src</sourceDirectory>
 		<resources>
 			<resource>
@@ -126,7 +126,8 @@
 		<url>https://github.com/opensourceBIM/IfcPlugins.git</url>
 		<connection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</connection>
 		<developerConnection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</developerConnection>
-	</scm>
+	  <tag>HEAD</tag>
+  </scm>
 	<organization>
 		<name>OpenSource BIM</name>
 		<url>opensourcebim.org</url>
