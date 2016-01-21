@@ -28,28 +28,11 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public class NameBasedModelComparePlugin implements ModelComparePlugin {
 
-	private boolean initialized;
 	private PluginManagerInterface pluginManager;
 
 	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
 		this.pluginManager = pluginManager;
-		initialized = true;
-	}
-
-	@Override
-	public String getDescription() {
-		return "Name based compare";
-	}
-
-	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override
@@ -60,7 +43,7 @@ public class NameBasedModelComparePlugin implements ModelComparePlugin {
 	@Override
 	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration) throws ModelCompareException {
 		try {
-			return new NameBasedModelCompare(pluginManager.requireObjectIDM());
+			return new NameBasedModelCompare(pluginManager.getDefaultObjectIDM());
 		} catch (ObjectIDMException e) {
 			throw new ModelCompareException(e);
 		}

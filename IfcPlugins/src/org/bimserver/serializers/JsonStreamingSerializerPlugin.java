@@ -30,16 +30,8 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
-	private boolean initialized;
-
 	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		initialized = true;
-	}
-
-	@Override
-	public String getDescription() {
-		return "JsonStreamingSerializer";
 	}
 
 	@Override
@@ -48,18 +40,8 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 	}
 
 	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
-	@Override
 	public ObjectDefinition getSettingsDefinition() {
 		return null;
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override

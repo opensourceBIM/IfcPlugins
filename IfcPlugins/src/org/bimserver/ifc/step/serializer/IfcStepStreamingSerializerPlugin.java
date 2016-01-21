@@ -29,18 +29,6 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public abstract class IfcStepStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
-	private boolean initialized = false;
-
-	@Override
-	public String getDescription() {
-		return "IfcStepSerializer";
-	}
-
-	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
 	@Override
 	public boolean needsGeometry() {
 		return false;
@@ -48,7 +36,6 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 	
 	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		initialized = true;
 	}
 
 	public String getDefaultContentType() {
@@ -57,11 +44,6 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 
 	public String getDefaultExtension() {
 		return "ifc";
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override

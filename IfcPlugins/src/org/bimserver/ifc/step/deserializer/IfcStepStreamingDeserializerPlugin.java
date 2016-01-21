@@ -24,26 +24,13 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDeserializerPlugin {
 
-	boolean initialized = false;
-	
-	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
 	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		initialized = true;
 	}
 
 	@Override
 	public boolean canHandleExtension(String extension) {
 		return extension.equalsIgnoreCase("ifc") || extension.equalsIgnoreCase("ifczip");
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override

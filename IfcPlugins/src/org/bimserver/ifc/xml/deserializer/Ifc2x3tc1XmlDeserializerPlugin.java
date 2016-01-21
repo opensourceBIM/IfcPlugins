@@ -25,10 +25,6 @@ import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.deserializers.EmfDeserializer;
 
 public class Ifc2x3tc1XmlDeserializerPlugin extends IfcXmlDeserializerPlugin  {
-	@Override
-	public String getDescription() {
-		return "Ifc2x3tc1 Xml Deserializer";
-	}
 
 	@Override
 	public String getDefaultName() {

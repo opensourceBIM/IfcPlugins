@@ -29,31 +29,13 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public class JsonSerializerPlugin extends AbstractSerializerPlugin {
 
-	private boolean initialized = false;
-
 	@Override
 	public EmfSerializer createSerializer(PluginConfiguration pluginConfiguration) {
 		return new JsonSerializer();
 	}
 
 	@Override
-	public String getDescription() {
-		return "JsonSerializer";
-	}
-
-	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
-	@Override
-	public boolean needsGeometry() {
-		return false;
-	}
-	
-	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		initialized = true;
 	}
 
 	@Override
@@ -69,11 +51,6 @@ public class JsonSerializerPlugin extends AbstractSerializerPlugin {
 	@Override
 	public String getDefaultExtension() {
 		return "json";
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override

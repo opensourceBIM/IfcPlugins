@@ -36,11 +36,6 @@ public class Ifc4StepDeserializerPlugin extends IfcStepDeserializerPlugin {
 		set.add(Schema.IFC4);
 		return set;
 	}
-	
-	@Override
-	public String getDescription() {
-		return "Ifc4 Step Deserializer";
-	}
 
 	@Override
 	public String getDefaultName() {

@@ -29,16 +29,8 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public class JsonDeserializerPlugin implements DeserializerPlugin {
 
-	private boolean initialized;
-
 	@Override
 	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		initialized = true;
-	}
-
-	@Override
-	public String getDescription() {
-		return "JsonDeserializerPlugin";
 	}
 
 	@Override
@@ -47,18 +39,8 @@ public class JsonDeserializerPlugin implements DeserializerPlugin {
 	}
 
 	@Override
-	public String getVersion() {
-		return "1.0";
-	}
-
-	@Override
 	public ObjectDefinition getSettingsDefinition() {
 		return null;
-	}
-
-	@Override
-	public boolean isInitialized() {
-		return initialized;
 	}
 
 	@Override

@@ -37,11 +37,6 @@ public class Ifc2x3tc1StepStreamingDeserializerPlugin extends IfcStepStreamingDe
 	}
 
 	@Override
-	public String getDescription() {
-		return "Ifc2x3tc1 Step Streaming Deserializer";
-	}
-
-	@Override
 	public String getDefaultName() {
 		return "Ifc2x3tc1 Step Streaming Deserializer (BETA)";
 	}
