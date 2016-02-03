@@ -39,6 +39,27 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-artifacts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>icon.png</file>
+									<type>png</type>
+									<classifier>icon</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
@@ -142,12 +163,12 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>pluginbase</artifactId>
-			<version>1.5.25</version>
+			<version>1.5.26</version>
 		</dependency>
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.25</version>
+			<version>1.5.26</version>
 		</dependency>
 	</dependencies>
 	<scm>
