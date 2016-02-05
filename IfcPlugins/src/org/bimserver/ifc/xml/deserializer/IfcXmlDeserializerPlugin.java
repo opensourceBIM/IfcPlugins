@@ -18,14 +18,14 @@ package org.bimserver.ifc.xml.deserializer;
  *****************************************************************************/
 
 import org.bimserver.models.store.ObjectDefinition;
-import org.bimserver.plugins.PluginManagerInterface;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.DeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
 public abstract class IfcXmlDeserializerPlugin implements DeserializerPlugin {
 
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
+	public void init(PluginContext pluginContext) throws PluginException {
 	}
 
 	@Override

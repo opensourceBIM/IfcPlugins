@@ -18,7 +18,6 @@ package org.bimserver.ifc.step.serializer;
  *****************************************************************************/
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.emf.PackageMetaData;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ProjectInfo;
@@ -31,8 +30,8 @@ public class Ifc4StepSerializer extends IfcStepSerializer {
 	}
 	
 	@Override
-	public void init(IfcModelInterface model, ProjectInfo projectInfo, PluginManagerInterface pluginManager, PackageMetaData packageMetaData, boolean normalizeOids) throws SerializerException {
+	public void init(IfcModelInterface model, ProjectInfo projectInfo, PluginManagerInterface pluginManager, boolean normalizeOids) throws SerializerException {
 		setHeaderSchema("IFC4");
-		super.init(model, projectInfo, pluginManager, packageMetaData, normalizeOids);
+		super.init(model, projectInfo, pluginManager, normalizeOids);
 	}
 }

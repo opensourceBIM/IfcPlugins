@@ -20,7 +20,6 @@ package org.bimserver.serializers;
 import java.io.OutputStream;
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.emf.PackageMetaData;
 import org.bimserver.emf.SharedJsonSerializer;
 import org.bimserver.ifc.IfcSerializer;
 import org.bimserver.plugins.PluginManagerInterface;
@@ -33,15 +32,11 @@ public class JsonSerializerWithGeometry extends IfcSerializer {
 	private SharedJsonSerializer sharedJsonSerializer;
 
 	@Override
-	public void init(IfcModelInterface model, ProjectInfo projectInfo, PluginManagerInterface pluginManager, PackageMetaData packageMetaData, boolean normalizeOids) throws SerializerException {
-		super.init(model, projectInfo, pluginManager, packageMetaData, normalizeOids);
+	public void init(IfcModelInterface model, ProjectInfo projectInfo, PluginManagerInterface pluginManager, boolean normalizeOids) throws SerializerException {
+		super.init(model, projectInfo, pluginManager, normalizeOids);
 		sharedJsonSerializer = new SharedJsonSerializer(getModel(), true);
 	}
 	
-	@Override
-	public void reset() {
-	}
-
 	@Override
 	protected boolean write(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
 		return sharedJsonSerializer.write(outputStream, progressReporter);

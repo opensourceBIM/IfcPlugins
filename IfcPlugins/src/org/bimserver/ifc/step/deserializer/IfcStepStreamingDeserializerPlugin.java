@@ -18,14 +18,14 @@ package org.bimserver.ifc.step.deserializer;
  *****************************************************************************/
 
 import org.bimserver.models.store.ObjectDefinition;
-import org.bimserver.plugins.PluginManagerInterface;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.StreamingDeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
 public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDeserializerPlugin {
 
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
+	public void init(PluginContext pluginContext) throws PluginException {
 	}
 
 	@Override

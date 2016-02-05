@@ -23,14 +23,14 @@ import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.models.store.StringType;
-import org.bimserver.plugins.PluginManagerInterface;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.serializers.AbstractSerializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
 public abstract class IfcXmlSerializerPlugin extends AbstractSerializerPlugin {
 
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
+	public void init(PluginContext pluginContext) throws PluginException {
 	}
 
 	@Override

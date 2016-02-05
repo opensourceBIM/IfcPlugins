@@ -78,11 +78,6 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 		this.headerSchema = headerSchema;
 	}
 	
-	@Override
-	public void reset() {
-		setMode(Mode.HEADER);
-	}
-	
 	public boolean write(OutputStream outputStream, ProgressReporter progressReporter) throws SerializerException {
 		try {
 			this.outputStream = outputStream;

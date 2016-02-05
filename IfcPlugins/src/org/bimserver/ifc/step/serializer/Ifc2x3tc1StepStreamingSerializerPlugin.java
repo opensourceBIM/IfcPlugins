@@ -24,10 +24,6 @@ import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.StreamingSerializer;
 
 public class Ifc2x3tc1StepStreamingSerializerPlugin extends IfcStepStreamingSerializerPlugin {
-	@Override
-	public String getDefaultName() {
-		return "Ifc2x3 (Streaming, BETA)";
-	}
 	
 	@Override
 	public StreamingSerializer createSerializer(PluginConfiguration pluginConfiguration) {

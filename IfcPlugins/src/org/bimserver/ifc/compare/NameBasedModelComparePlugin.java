@@ -19,6 +19,7 @@ package org.bimserver.ifc.compare;
 
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.modelcompare.ModelCompare;
 import org.bimserver.plugins.modelcompare.ModelCompareException;
@@ -28,22 +29,17 @@ import org.bimserver.shared.exceptions.PluginException;
 
 public class NameBasedModelComparePlugin implements ModelComparePlugin {
 
-	private PluginManagerInterface pluginManager;
+	private PluginContext pluginContext;
 
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
-		this.pluginManager = pluginManager;
-	}
-
-	@Override
-	public String getDefaultName() {
-		return "Name based compare";
+	public void init(PluginContext pluginContext) throws PluginException {
+		this.pluginContext = pluginContext;
 	}
 
 	@Override
 	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration) throws ModelCompareException {
 		try {
-			return new NameBasedModelCompare(pluginManager.getDefaultObjectIDM());
+			return new NameBasedModelCompare(pluginContext.getDefaultObjectIDM());
 		} catch (ObjectIDMException e) {
 			throw new ModelCompareException(e);
 		}

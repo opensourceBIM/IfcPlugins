@@ -34,9 +34,4 @@ public class Ifc2x3tc1StepDeserializerPlugin extends IfcStepDeserializerPlugin {
 	public Set<Schema> getSupportedSchemas() {
 		return Collections.singleton(Schema.IFC2X3TC1);
 	}
-	
-	@Override
-	public String getDefaultName() {
-		return "Ifc2x3tc1 Step Deserializer";
-	}
 }

@@ -24,10 +24,6 @@ import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.Serializer;
 
 public class Ifc2x3tc1StepSerializerPlugin extends IfcStepSerializerPlugin {
-	@Override
-	public String getDefaultName() {
-		return "Ifc2x3";
-	}
 	
 	@Override
 	public Serializer createSerializer(PluginConfiguration pluginConfiguration) {

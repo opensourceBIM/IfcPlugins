@@ -23,7 +23,7 @@ import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.models.store.StringType;
-import org.bimserver.plugins.PluginManagerInterface;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.serializers.StreamingSerializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
@@ -35,7 +35,7 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 	}
 	
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
+	public void init(PluginContext pluginContext) throws PluginException {
 	}
 
 	public String getDefaultContentType() {

@@ -34,9 +34,4 @@ public class IfcXml4SerializerPlugin extends IfcXmlSerializerPlugin {
 	public Serializer createSerializer(PluginConfiguration plugin) {
 		return new IfcXml4Serializer();
 	}
-
-	@Override
-	public String getDefaultName() {
-		return "Ifc2x3tc1 XML";
-	}
 }

@@ -22,7 +22,7 @@ import java.util.Set;
 import org.bimserver.emf.Schema;
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
-import org.bimserver.plugins.PluginManagerInterface;
+import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.Deserializer;
 import org.bimserver.plugins.deserializers.DeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
@@ -30,12 +30,7 @@ import org.bimserver.shared.exceptions.PluginException;
 public class JsonDeserializerPlugin implements DeserializerPlugin {
 
 	@Override
-	public void init(PluginManagerInterface pluginManager) throws PluginException {
-	}
-
-	@Override
-	public String getDefaultName() {
-		return "JsonDeserializerPlugin";
+	public void init(PluginContext pluginContext) throws PluginException {
 	}
 
 	@Override

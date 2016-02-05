@@ -35,9 +35,4 @@ public class Ifc2x3tc1StepStreamingDeserializerPlugin extends IfcStepStreamingDe
 	public Set<Schema> getSupportedSchemas() {
 		return Collections.singleton(Schema.IFC2X3TC1);
 	}
-
-	@Override
-	public String getDefaultName() {
-		return "Ifc2x3tc1 Step Streaming Deserializer (BETA)";
-	}
 }
