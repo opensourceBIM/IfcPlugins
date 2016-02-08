@@ -93,12 +93,8 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	
 	private static MetricCollector metricCollector = new MetricCollector();
 	
-	private final Map<EClass, AtomicInteger> summaryMap = new TreeMap<>(new Comparator<EClass>(){
-
-		@Override
-		public int compare(EClass o1, EClass o2) {
-			return o1.getName().compareTo(o2.getName());
-		}});
+	// Use String instead of EClass, compare takes 1.7%
+	private final Map<String, AtomicInteger> summaryMap = new TreeMap<>();
 
 	@Override
 	public void init(PackageMetaData packageMetaData) {
@@ -108,9 +104,15 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	
 	@Override
 	public Map<EClass, Integer> getSummaryMap() {
-		Map<EClass, Integer> newMap = new HashMap<>();
-		for (EClass key : this.summaryMap.keySet()) {
-			newMap.put(key, this.summaryMap.get(key).get());
+		Map<EClass, Integer> newMap = new TreeMap<>(new Comparator<EClass>(){
+			@Override
+			public int compare(EClass o1, EClass o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		for (String key : this.summaryMap.keySet()) {
+			EClass eClass = packageMetaData.getEClass(key);
+			newMap.put(eClass, this.summaryMap.get(key).get());
 		}
 		return newMap;
 	}
@@ -382,9 +384,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		EClass eClass = (EClass) getPackageMetaData().getEClassifierCaseInsensitive(name);
 		VirtualObject object = newVirtualObject(eClass, line.length());
 		
-		AtomicInteger atomicInteger = summaryMap.get(eClass);
+		AtomicInteger atomicInteger = summaryMap.get(eClass.getName());
 		if (atomicInteger == null) {
-			summaryMap.put(eClass, new AtomicInteger(1));
+			summaryMap.put(eClass.getName(), new AtomicInteger(1));
 		} else {
 			atomicInteger.incrementAndGet();
 		}
