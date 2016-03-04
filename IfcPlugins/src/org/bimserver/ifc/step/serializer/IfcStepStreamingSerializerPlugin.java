@@ -30,11 +30,6 @@ import org.bimserver.shared.exceptions.PluginException;
 public abstract class IfcStepStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
 	@Override
-	public boolean needsGeometry() {
-		return false;
-	}
-	
-	@Override
 	public void init(PluginContext pluginContext) throws PluginException {
 	}
 

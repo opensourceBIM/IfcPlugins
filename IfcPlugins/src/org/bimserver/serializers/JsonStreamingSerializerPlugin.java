@@ -45,11 +45,6 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 	}
 
 	@Override
-	public boolean needsGeometry() {
-		return true;
-	}
-
-	@Override
 	public Set<Schema> getSupportedSchemas() {
 		Set<Schema> schemas = new HashSet<>();
 		schemas.add(Schema.IFC2X3TC1);
