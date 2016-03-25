@@ -51,6 +51,7 @@ public abstract class IfcXmlSerializerPlugin extends AbstractSerializerPlugin {
 		stringDefinition.setType(PrimitiveEnum.STRING);
 
 		ParameterDefinition zipExtension = StoreFactory.eINSTANCE.createParameterDefinition();
+		zipExtension.setIdentifier(ZIP_EXTENSION);
 		zipExtension.setName(ZIP_EXTENSION);
 		zipExtension.setDescription("Extension of the downloaded file when using zip compression");
 		zipExtension.setType(stringDefinition);

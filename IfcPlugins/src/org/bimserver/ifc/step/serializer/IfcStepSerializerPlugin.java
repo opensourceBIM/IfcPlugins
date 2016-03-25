@@ -51,7 +51,8 @@ public abstract class IfcStepSerializerPlugin extends AbstractSerializerPlugin {
 		stringDefinition.setType(PrimitiveEnum.STRING);
 		
 		ParameterDefinition organizationParameter = StoreFactory.eINSTANCE.createParameterDefinition();
-		organizationParameter.setName("organization");
+		organizationParameter.setIdentifier("organization");
+		organizationParameter.setName("Organization");
 		organizationParameter.setDescription("Organization name to put in the header");
 		StringType defaultValue = StoreFactory.eINSTANCE.createStringType();
 		defaultValue.setValue("BIMserver.org");
@@ -60,6 +61,7 @@ public abstract class IfcStepSerializerPlugin extends AbstractSerializerPlugin {
 		objectDefinition.getParameters().add(organizationParameter);
 		
 		ParameterDefinition zipExtension = StoreFactory.eINSTANCE.createParameterDefinition();
+		zipExtension.setIdentifier(ZIP_EXTENSION);
 		zipExtension.setName(ZIP_EXTENSION);
 		zipExtension.setDescription("Extension of the downloaded file when using zip compression");
 		zipExtension.setType(stringDefinition);

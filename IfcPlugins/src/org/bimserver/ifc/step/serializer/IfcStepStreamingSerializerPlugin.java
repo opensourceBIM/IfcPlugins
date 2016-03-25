@@ -46,6 +46,7 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
 
 		ParameterDefinition extensionParameter = StoreFactory.eINSTANCE.createParameterDefinition();
+		extensionParameter.setIdentifier(EXTENSION);
 		extensionParameter.setName(EXTENSION);
 		extensionParameter.setDescription("Extension of the downloaded file");
 		PrimitiveDefinition stringType = StoreFactory.eINSTANCE.createPrimitiveDefinition();
@@ -57,6 +58,7 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 		objectDefinition.getParameters().add(extensionParameter);
 
 		ParameterDefinition contentTypeParameter = StoreFactory.eINSTANCE.createParameterDefinition();
+		contentTypeParameter.setIdentifier(CONTENT_TYPE);
 		contentTypeParameter.setName(CONTENT_TYPE);
 		contentTypeParameter.setDescription("Content-Type in the HTTP header of the downloaded file");
 		contentTypeParameter.setType(stringType);
@@ -69,7 +71,8 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 		stringDefinition.setType(PrimitiveEnum.STRING);
 		
 		ParameterDefinition organizationParameter = StoreFactory.eINSTANCE.createParameterDefinition();
-		organizationParameter.setName("organization");
+		organizationParameter.setIdentifier("organization");
+		organizationParameter.setName("Organization");
 		organizationParameter.setDescription("Organization name to put in the header");
 		StringType defaultValue = StoreFactory.eINSTANCE.createStringType();
 		defaultValue.setValue("BIMserver.org");
@@ -78,6 +81,7 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 		objectDefinition.getParameters().add(organizationParameter);
 		
 		ParameterDefinition zipExtension = StoreFactory.eINSTANCE.createParameterDefinition();
+		zipExtension.setIdentifier(ZIP_EXTENSION);
 		zipExtension.setName(ZIP_EXTENSION);
 		zipExtension.setDescription("Extension of the downloaded file when using zip compression");
 		zipExtension.setType(stringDefinition);

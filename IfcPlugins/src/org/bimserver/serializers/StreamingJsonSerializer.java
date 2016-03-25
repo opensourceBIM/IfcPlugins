@@ -24,6 +24,7 @@ import org.bimserver.BimserverDatabaseException;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.emf.SharedJsonStreamingSerializer;
 import org.bimserver.models.store.IfcHeader;
+import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ObjectProvider;
 import org.bimserver.plugins.serializers.ProjectInfo;
@@ -34,6 +35,11 @@ public class StreamingJsonSerializer implements StreamingSerializer {
 
 	private ObjectProvider objectProvider;
 	private IfcHeader ifcHeader;
+	private PluginConfiguration pluginConfiguration;
+
+	public StreamingJsonSerializer(PluginConfiguration pluginConfiguration) {
+		this.pluginConfiguration = pluginConfiguration;
+	}
 
 	@Override
 	public void init(ObjectProvider objectProvider, ProjectInfo projectInfo, IfcHeader ifcHeader, PluginManagerInterface pluginManager, PackageMetaData packageMetaData) throws SerializerException {

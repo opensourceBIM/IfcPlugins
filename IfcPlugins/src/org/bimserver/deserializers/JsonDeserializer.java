@@ -30,7 +30,7 @@ public class JsonDeserializer extends EmfDeserializer {
 
 	@Override
 	public IfcModelInterface read(InputStream in, String filename, long fileSize, ByteProgressReporter progressReporter) throws DeserializeException {
-		IfcModelInterface model = new SharedJsonDeserializer(true).read(in, new BasicIfcModel(getPackageMetaData(), null));
+		IfcModelInterface model = new SharedJsonDeserializer(true).read(in, new BasicIfcModel(getPackageMetaData(), null), true);
 		model.resetOids();
 		return model;
 	}

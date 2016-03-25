@@ -471,7 +471,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							}
 						}
 					} else {
-						waitingList.add(referenceId, new ListWaitingObject(lineNumber, object, structuralFeature, index));
+						waitingList.add(referenceId, new ListWaitingObject(lineNumber, object, (EReference) structuralFeature, index));
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
@@ -640,7 +640,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		if (model.contains(referenceId)) {
 			object.eSet(structuralFeature, model.get(referenceId));
 		} else {
-			waitingList.add(referenceId, new SingleWaitingObject(lineNumber, object, structuralFeature));
+			waitingList.add(referenceId, new SingleWaitingObject(lineNumber, object, (EReference) structuralFeature));
 		}
 	}
 }

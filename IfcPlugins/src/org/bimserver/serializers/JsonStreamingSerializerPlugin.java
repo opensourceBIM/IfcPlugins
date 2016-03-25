@@ -22,6 +22,11 @@ import java.util.Set;
 
 import org.bimserver.emf.Schema;
 import org.bimserver.models.store.ObjectDefinition;
+import org.bimserver.models.store.ParameterDefinition;
+import org.bimserver.models.store.PrimitiveDefinition;
+import org.bimserver.models.store.PrimitiveEnum;
+import org.bimserver.models.store.StoreFactory;
+import org.bimserver.models.store.StringType;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.serializers.StreamingSerializer;
@@ -36,12 +41,46 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 
 	@Override
 	public ObjectDefinition getSettingsDefinition() {
-		return null;
+		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
+
+		ParameterDefinition extensionParameter = StoreFactory.eINSTANCE.createParameterDefinition();
+		extensionParameter.setIdentifier(EXTENSION);
+		extensionParameter.setDescription("Extension of the downloaded file");
+		PrimitiveDefinition stringType = StoreFactory.eINSTANCE.createPrimitiveDefinition();
+		stringType.setType(PrimitiveEnum.STRING);
+		extensionParameter.setType(stringType);
+		StringType defaultExtensionValue = StoreFactory.eINSTANCE.createStringType();
+		defaultExtensionValue.setValue("json");
+		extensionParameter.setDefaultValue(defaultExtensionValue);
+		objectDefinition.getParameters().add(extensionParameter);
+
+		ParameterDefinition contentTypeParameter = StoreFactory.eINSTANCE.createParameterDefinition();
+		contentTypeParameter.setIdentifier(CONTENT_TYPE);
+		contentTypeParameter.setDescription("Content-Type in the HTTP header of the downloaded file");
+		contentTypeParameter.setType(stringType);
+		StringType defaultContentTypeValue = StoreFactory.eINSTANCE.createStringType();
+		defaultContentTypeValue.setValue("application/json");
+		contentTypeParameter.setDefaultValue(defaultContentTypeValue);
+		objectDefinition.getParameters().add(contentTypeParameter);
+		
+		PrimitiveDefinition stringDefinition = StoreFactory.eINSTANCE.createPrimitiveDefinition();
+		stringDefinition.setType(PrimitiveEnum.STRING);
+		
+		ParameterDefinition zipExtension = StoreFactory.eINSTANCE.createParameterDefinition();
+		zipExtension.setIdentifier(ZIP_EXTENSION);
+		zipExtension.setDescription("Extension of the downloaded file when using zip compression");
+		zipExtension.setType(stringDefinition);
+		StringType defaultZipExtensionValue = StoreFactory.eINSTANCE.createStringType();
+		defaultZipExtensionValue.setValue("zip");
+		zipExtension.setDefaultValue(defaultZipExtensionValue);
+		objectDefinition.getParameters().add(zipExtension);
+		
+		return objectDefinition;
 	}
 
 	@Override
-	public StreamingSerializer createSerializer(PluginConfiguration plugin) {
-		return new StreamingJsonSerializer();
+	public StreamingSerializer createSerializer(PluginConfiguration pluginConfiguration) {
+		return new StreamingJsonSerializer(pluginConfiguration);
 	}
 
 	@Override
