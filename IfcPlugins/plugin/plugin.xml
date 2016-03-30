@@ -52,6 +52,7 @@
 		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifc.xml.serializer.IfcXml2x3tc1SerializerPlugin</implementationClass>
 		<description>IfcXml 2x3tc1 Serializer</description>
+		<name>IfcXml 2x3tc1</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
