@@ -26,9 +26,11 @@ import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.bimserver.emf.PackageMetaData;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.eclipse.emf.common.util.Enumerator;
+import org.eclipse.emf.ecore.EEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +40,7 @@ public class IfcParserWriterUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcParserWriterUtils.class);
 	private static final boolean USE_ISO_8859_1 = false;
 
-	public static Object convertSimpleValue(Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
+	public static Object convertSimpleValue(PackageMetaData packageMetaData, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
 			if (instanceClass == Integer.class || instanceClass == int.class) {
 				return Integer.parseInt(value);
@@ -46,6 +48,16 @@ public class IfcParserWriterUtils {
 				return Long.parseLong(value);
 			} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
 				return Boolean.parseBoolean(value);
+			} else if (instanceClass.getSimpleName().equals("Tristate")) {
+				EEnum eEnum = packageMetaData.getEEnum("Tristate");
+				if (value.toString().equals("TRUE")) {
+					return eEnum.getEEnumLiteral("TRUE");
+				} else if (value.toString().equals("FALSE")) {
+					return eEnum.getEEnumLiteral("FALSE");
+				} else if (value.toString().equals("UNDEFINED")) {
+					return eEnum.getEEnumLiteral("UNDEFINED");
+				}
+				throw new DeserializeException("Unknown value: " + value);
 			} else if (instanceClass == Double.class || instanceClass == double.class) {
 				try {
 					return Double.parseDouble(value);

@@ -545,7 +545,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					return processInline(classifier, value);
 				}
 			} else if (classifier instanceof EDataType) {
-				return IfcParserWriterUtils.convertSimpleValue(classifier.getInstanceClass(), value, lineNumber);
+				return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
 			}
 		}
 		return null;
@@ -568,7 +568,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				throw new DeserializeException(lineNumber, typeName + " is not an existing IFC entity");
 			}
 		} else {
-			return IfcParserWriterUtils.convertSimpleValue(classifier.getInstanceClass(), value, lineNumber);
+			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
 		}
 	}
 
