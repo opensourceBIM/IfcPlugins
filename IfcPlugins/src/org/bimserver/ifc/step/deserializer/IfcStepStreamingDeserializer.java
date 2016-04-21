@@ -144,7 +144,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				}
 				if (nextEntry.getName().toUpperCase().endsWith(".IFC")) {
 					FakeClosingInputStream fakeClosingInputStream = new FakeClosingInputStream(zipInputStream);
-					read(fakeClosingInputStream, fileSize);
+					long size = read(fakeClosingInputStream, fileSize);
 //					if (model.size() == 0) {
 //						throw new DeserializeException("Uploaded file does not seem to be a correct IFC file");
 //					}
@@ -154,6 +154,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					} else {
 						zipInputStream.close();
 					}
+					return size;
 				} else {
 					throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
 				}
@@ -163,7 +164,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		} else {
 			return read(in, fileSize);
 		}
-		return -1;
 	}
 
 	private void filterComments(Tokenizer tokenizer) throws TokenizeException {
