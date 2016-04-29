@@ -39,6 +39,7 @@ import org.bimserver.plugins.serializers.SerializerException;
 import org.bimserver.plugins.serializers.SerializerInputstream;
 import org.bimserver.plugins.serializers.StreamingReader;
 import org.bimserver.plugins.serializers.StreamingSerializer;
+import org.bimserver.shared.AbstractHashMapVirtualObject;
 import org.bimserver.shared.HashMapVirtualObject;
 import org.bimserver.shared.HashMapWrappedVirtualObject;
 import org.bimserver.shared.MinimalVirtualObject;
@@ -48,7 +49,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EEnum;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
@@ -280,8 +280,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 
 	private void writeEClass(HashMapVirtualObject object, EStructuralFeature feature) throws SerializerException, IOException {
 		Object referencedObject = object.eGet(feature);
-		if (referencedObject instanceof HashMapVirtualObject && ((HashMapVirtualObject)referencedObject).eClass().getEAnnotation("wrapped") != null) {
-			writeWrappedValue(object, feature, ((EObject)referencedObject).eClass());
+		if (referencedObject instanceof AbstractHashMapVirtualObject && ((AbstractHashMapVirtualObject)referencedObject).eClass().getEAnnotation("wrapped") != null) {
+			writeWrappedValue(object, feature, ((AbstractHashMapVirtualObject)referencedObject).eClass());
 		} else {
 			if (referencedObject instanceof Long) {
 				if (object.useFeatureForSerialization(feature)) {
@@ -473,9 +473,9 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		Object get = object.eGet(feature);
 		boolean isWrapped = ec.getEAnnotation("wrapped") != null;
 		EStructuralFeature structuralFeature = ec.getEStructuralFeature(WRAPPED_VALUE);
-		if (get instanceof EObject) {
+		if (get instanceof HashMapWrappedVirtualObject) {
 			boolean isDefinedWrapped = feature.getEType().getEAnnotation("wrapped") != null;
-			HashMapVirtualObject betweenObject = (HashMapVirtualObject) get;
+			HashMapWrappedVirtualObject betweenObject = (HashMapWrappedVirtualObject) get;
 			if (betweenObject != null) {
 				if (isWrapped && isDefinedWrapped) {
 					Object val = betweenObject.eGet(structuralFeature);
@@ -490,7 +490,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 						IfcParserWriterUtils.writePrimitive(val, outputStream);
 					}
 				} else {
-//					writeEmbedded(betweenObject);
+					writeEmbedded(betweenObject);
 				}
 			}
 		} else if (get instanceof EList<?>) {
@@ -521,20 +521,20 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 				}
 				print(CLOSE_PAREN);
 			}
-		} else {
-			if (get == null) {
-				EClassifier type = structuralFeature.getEType();
-				if (type.getName().equals("IfcBoolean") || type.getName().equals("IfcLogical") || type == ECORE_PACKAGE_INSTANCE.getEBoolean()) {
-					print(BOOLEAN_UNDEFINED);
+		} else if (get == null) {
+			EClassifier type = structuralFeature.getEType();
+			if (type.getName().equals("IfcBoolean") || type.getName().equals("IfcLogical") || type == ECORE_PACKAGE_INSTANCE.getEBoolean()) {
+				print(BOOLEAN_UNDEFINED);
+			} else {
+				EntityDefinition entityBN = getSchemaDefinition().getEntityBN(object.eClass().getName());
+				if (entityBN != null && entityBN.isDerived(feature.getName())) {
+					print(ASTERISK);
 				} else {
-					EntityDefinition entityBN = getSchemaDefinition().getEntityBN(object.eClass().getName());
-					if (entityBN != null && entityBN.isDerived(feature.getName())) {
-						print(ASTERISK);
-					} else {
-						print(DOLLAR);
-					}
+					print(DOLLAR);
 				}
 			}
+		} else {
+			System.out.println("Unimplemented?");
 		}
 	}
 
