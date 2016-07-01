@@ -19,10 +19,17 @@ package org.bimserver.ifc.xml.deserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -33,8 +40,8 @@ import org.bimserver.emf.IfcModelInterfaceException;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.ifc.BasicIfcModel;
 import org.bimserver.ifc.IfcModel;
-import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Factory;
-import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
+import org.bimserver.models.store.IfcHeader;
+import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.EmfDeserializer;
@@ -111,11 +118,90 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 				if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
 					if (reader.getLocalName().equalsIgnoreCase("iso_10303_28")) {
 						parseIso_10303_28(reader);
+					} else if (reader.getLocalName().equalsIgnoreCase("ifcxml")) {
+						parseIfc4(reader);
 					}
 				}
 			}
 		} catch (XMLStreamException e) {
 			throw new DeserializeException(e);
+		}
+	}
+
+	private void parseIfc4(XMLStreamReader reader) throws DeserializeException {
+		try {
+			while (reader.hasNext()) {
+				reader.next();
+				if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
+					if (reader.getLocalName().equalsIgnoreCase("header")) {
+						parseHeader(reader);
+					} else {
+						parseObject(reader);
+					}
+				}
+			}
+		} catch (XMLStreamException e) {
+			throw new DeserializeException(e);
+		}
+	}
+
+	private void parseHeader(XMLStreamReader reader) throws XMLStreamException {
+		/*
+		 * 
+		 * <name>Lise-Meitner-Str.1, 10589 Berlin</name>
+    <time_stamp>2015-10-05T10:20:47.3587387+02:00</time_stamp>
+    <author>Lellonek</author>
+    <organization>eTASK Service-Management GmbH</organization>
+    <preprocessor_version>.NET API etask.ifc</preprocessor_version>
+    <originating_system>.NET API etask.ifc</originating_system>
+    <authorization>file created with .NET API etask.ifc</authorization>
+    <documentation>ViewDefinition [notYetAssigned]</documentation>
+		 */
+		
+		IfcHeader ifcHeader = model.getModelMetaData().getIfcHeader();
+		if (ifcHeader == null) {
+			ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+			model.getModelMetaData().setIfcHeader(ifcHeader);
+		}
+
+		while (reader.hasNext()) {
+			reader.next();
+			if (reader.getEventType() == XMLStreamReader.START_ELEMENT) {
+				String localname = reader.getLocalName();
+				if (localname.equalsIgnoreCase("name")) {
+					reader.next();
+					ifcHeader.setFilename(reader.getText());
+				} else if (localname.equals("time_stamp")) {
+					reader.next();
+					try {
+						ifcHeader.setTimeStamp(DatatypeFactory
+						  .newInstance()
+						  .newXMLGregorianCalendar(reader.getText()).toGregorianCalendar().getTime());
+					} catch (DatatypeConfigurationException e1) {
+						e1.printStackTrace();
+					}
+				} else if (localname.equals("author")) {
+					reader.next();
+					ifcHeader.getAuthor().add(reader.getText());
+				} else if (localname.equals("organization")) {
+					reader.next();
+					ifcHeader.getOrganization().add(reader.getText());
+				} else if (localname.equals("preprocessor_version")) {
+					reader.next();
+					ifcHeader.setPreProcessorVersion(reader.getText());
+				} else if (localname.equals("originating_system")) {
+					reader.next();
+					ifcHeader.setOriginatingSystem(reader.getText());
+				} else if (localname.equals("authorization")) {
+					reader.next();
+					ifcHeader.setAuthorization(reader.getText());
+				} else if (localname.equals("documentation")) {
+				}
+			} else if (reader.getEventType() == XMLStreamReader.END_ELEMENT) {
+				if (reader.getLocalName().equals("header")) {
+					return;
+				}
+			}
 		}
 	}
 
@@ -157,7 +243,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 
 	private IdEObject parseObject(XMLStreamReader reader) throws DeserializeException {
 		String className = reader.getLocalName();
-		EClassifier eClassifier = Ifc2x3tc1Package.eINSTANCE.getEClassifier(className);
+		EClassifier eClassifier = model.getPackageMetaData().getEClassifier(className);
 		if (eClassifier == null || !(eClassifier instanceof EClass)) {
 			throw new DeserializeException("No class with name " + className + " was found");
 		}
@@ -174,7 +260,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 		if (model.contains(oid)) {
 			object = model.get(oid);
 		} else {
-			object = (IdEObject) Ifc2x3tc1Factory.eINSTANCE.create(eClass);
+			object = (IdEObject) model.getPackageMetaData().create(eClass);
 			try {
 				model.add(oid, object);
 			} catch (IfcModelInterfaceException e) {
@@ -226,7 +312,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 						IdEObject reference = null;
 						if (!model.contains(refId)) {
 							String referenceType = reader.getLocalName();
-							reference = (IdEObject) Ifc2x3tc1Factory.eINSTANCE.create((EClass) Ifc2x3tc1Package.eINSTANCE.getEClassifier(referenceType));
+							reference = (IdEObject) model.getPackageMetaData().create((EClass) model.getPackageMetaData().getEClassifier(referenceType));
 							try {
 								model.add(refId, reference);
 							} catch (IfcModelInterfaceException e) {
@@ -255,8 +341,10 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 							object.eSet(eStructuralFeature, reference);
 						}
 					} else {
-						String realTypeString = reader.getLocalName();
-						realType = Ifc2x3tc1Package.eINSTANCE.getEClassifier(realTypeString);
+						// TODO
+						String embeddedFieldName = reader.getLocalName();
+						IdEObject embedded = (IdEObject) model.getPackageMetaData().create((EClass)eStructuralFeature.getEType());
+						object.eSet(eStructuralFeature, embedded);
 					}
 				} else if (reader.getEventType() == XMLStreamReader.END_ELEMENT) {
 					if (reader.getLocalName().equalsIgnoreCase(fieldName)) {
@@ -285,7 +373,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 							if (realType instanceof EClass) {
 								EClass eClass = (EClass) realType;
 								if (eClass.getEAnnotation("wrapped") != null) {
-									IdEObject wrappedObject = (IdEObject) Ifc2x3tc1Factory.eINSTANCE.create(eClass);
+									IdEObject wrappedObject = (IdEObject) model.getPackageMetaData().create(eClass);
 									// model.add(wrappedObject);
 									EStructuralFeature wrappedValueFeature = eClass.getEStructuralFeature("wrappedValue");
 									wrappedObject.eSet(wrappedValueFeature, parsePrimitive(wrappedValueFeature.getEType(), text));
