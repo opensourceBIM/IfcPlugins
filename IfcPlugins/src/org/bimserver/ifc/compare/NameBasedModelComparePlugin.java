@@ -20,7 +20,6 @@ package org.bimserver.ifc.compare;
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
-import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.modelcompare.ModelCompare;
 import org.bimserver.plugins.modelcompare.ModelCompareException;
 import org.bimserver.plugins.modelcompare.ModelComparePlugin;
