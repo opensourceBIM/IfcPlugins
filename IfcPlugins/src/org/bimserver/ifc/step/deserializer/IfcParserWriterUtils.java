@@ -90,19 +90,28 @@ public class IfcParserWriterUtils {
 		return null;
 	}
 	
+	/**
+	 * Decode a piece of text according to ISO-10303-21
+	 * 
+	 * Known possible problems:
+	 * 	- The order of parsing (X, X2, X4, S) at the time of writing is arbitrary (and has been changed, the S was in front before, causing problems with IFC files outputted by other software). The ISO docs don't say anything about it.
+	 * 		- Example: \X2\3010\X0\S\X2\301194DD540891D1\X0\, results will be different depending on whether the 'X2' is parsed first or the 'S'
+	 *  - This code will process the output of one encoding phase, and possibly use it in the next phase, this is most definitely not according to the standard. Somehow it should be marked which parts are still up for parsing and which parst aren't
+	 *  - Overall structure of the code is quite error prone, using a well known parser library/strategy might be better
+	 *  - One more note of frustration: It is completely insane to encode text within text
+	 * 
+	 * 
+	 * @param value The original value
+	 * @param lineNumber, used for throwing exceptions with line numbers
+	 * @return The decoded string
+	 * @throws DeserializeException
+	 */
 	public static String readString(String value, int lineNumber) throws DeserializeException {
 		String result = value.substring(1, value.length() - 1);
 		// Replace all '' with '
 		while (result.contains("''")) {
 			int index = result.indexOf("''");
 			result = result.substring(0, index) + "'" + result.substring(index + 2);
-		}
-		while (result.contains("\\S\\")) {
-			int index = result.indexOf("\\S\\");
-			char x = result.charAt(index + 3);
-			ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (x + 128) });
-			CharBuffer decode = Charsets.ISO_8859_1.decode(b);
-			result = result.substring(0, index) + decode.get() + result.substring(index + 4);
 		}
 		while (result.contains("\\X\\")) {
 			int index = result.indexOf("\\X\\");
@@ -113,7 +122,7 @@ public class IfcParserWriterUtils {
 		}
 		while (result.contains("\\X2\\")) {
 			int index = result.indexOf("\\X2\\");
-			int indexOfEnd = result.indexOf("\\X0\\");
+			int indexOfEnd = result.indexOf("\\X0\\", index);
 			if (indexOfEnd == -1) {
 				throw new DeserializeException(lineNumber, "\\X2\\ not closed with \\X0\\");
 			}
@@ -130,7 +139,7 @@ public class IfcParserWriterUtils {
 		}
 		while (result.contains("\\X4\\")) {
 			int index = result.indexOf("\\X4\\");
-			int indexOfEnd = result.indexOf("\\X0\\");
+			int indexOfEnd = result.indexOf("\\X0\\", index);
 			if (indexOfEnd == -1) {
 				throw new DeserializeException(lineNumber, "\\X4\\ not closed with \\X0\\");
 			}
@@ -146,6 +155,13 @@ public class IfcParserWriterUtils {
 			} catch (UnsupportedCharsetException e) {
 				throw new DeserializeException(lineNumber, "UTF-32 is not supported on your system", e);
 			}
+		}
+		while (result.contains("\\S\\")) {
+			int index = result.indexOf("\\S\\");
+			char x = result.charAt(index + 3);
+			ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (x + 128) });
+			CharBuffer decode = Charsets.ISO_8859_1.decode(b);
+			result = result.substring(0, index) + decode.get() + result.substring(index + 4);
 		}
 		// Replace all \\ with \
 		while (result.contains("\\\\")) {
