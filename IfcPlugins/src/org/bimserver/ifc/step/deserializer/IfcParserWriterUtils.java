@@ -143,7 +143,7 @@ public class IfcParserWriterUtils {
 			if (indexOfEnd == -1) {
 				throw new DeserializeException(lineNumber, "\\X4\\ not closed with \\X0\\");
 			}
-			if ((indexOfEnd - index) % 8 != 0) {
+			if ((indexOfEnd - (index + 4)) % 8 != 0) {
 				throw new DeserializeException(lineNumber, "Number of hex chars in \\X4\\ definition not divisible by 8");
 			}
 			try {
