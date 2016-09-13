@@ -106,9 +106,8 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 			parseDocument(reader);
 			return model;
 		} catch (XMLStreamException e) {
-			new DeserializeException(e);
+			throw new DeserializeException(e);
 		}
-		return null;
 	}
 
 	private void parseDocument(XMLStreamReader reader) throws DeserializeException {
