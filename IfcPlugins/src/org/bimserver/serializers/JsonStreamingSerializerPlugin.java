@@ -95,7 +95,7 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 	public String getOutputFormat(Schema schema) {
 		switch (schema) {
 		case IFC2X3TC1:
-			return "IFC_JSON_2x3TC1";
+			return "IFC_JSON_2X3TC1";
 		case IFC4:
 			return "IFC_JSON_4";
 		default:
