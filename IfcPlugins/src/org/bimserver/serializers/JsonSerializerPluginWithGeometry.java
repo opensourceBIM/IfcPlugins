@@ -57,4 +57,15 @@ public class JsonSerializerPluginWithGeometry extends AbstractSerializerPlugin {
 	public Set<Schema> getSupportedSchemas() {
 		return Schema.asSet(Schema.IFC2X3TC1, Schema.IFC4);
 	}
+
+	@Override
+	public String getOutputFormat(Schema schema) {
+		switch (schema) {
+		case IFC2X3TC1:
+			return "IFC_JSON_GEOM_2x3TC1";
+		case IFC4:
+			return "IFC_JSON_GEOM_4";
+		default: return null;
+		}
+	}
 }

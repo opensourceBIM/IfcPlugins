@@ -34,4 +34,9 @@ public class Ifc4StepStreamingSerializerPlugin extends IfcStepStreamingSerialize
 	public Set<Schema> getSupportedSchemas() {
 		return Schema.IFC4.toSet();
 	}
+
+	@Override
+	public String getOutputFormat(Schema schema) {
+		return "IFC_STEP_4";
+	}
 }

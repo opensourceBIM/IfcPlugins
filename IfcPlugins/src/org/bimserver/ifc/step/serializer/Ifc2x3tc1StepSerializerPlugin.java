@@ -34,4 +34,9 @@ public class Ifc2x3tc1StepSerializerPlugin extends IfcStepSerializerPlugin {
 	public Set<Schema> getSupportedSchemas() {
 		return Schema.IFC2X3TC1.toSet();
 	}
+
+	@Override
+	public String getOutputFormat(Schema schema) {
+		return "IFC_STEP_2X3TC1";
+	}
 }

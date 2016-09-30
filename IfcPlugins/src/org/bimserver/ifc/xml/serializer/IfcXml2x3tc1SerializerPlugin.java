@@ -34,4 +34,9 @@ public class IfcXml2x3tc1SerializerPlugin extends IfcXmlSerializerPlugin {
 	public Serializer createSerializer(PluginConfiguration plugin) {
 		return new IfcXml2x3tc1Serializer();
 	}
+
+	@Override
+	public String getOutputFormat(Schema schema) {
+		return "IFC_XML_2x3TC1";
+	}
 }
