@@ -19,6 +19,7 @@ package org.bimserver.ifc.step.deserializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -43,7 +44,16 @@ public class IfcParserWriterUtils {
 	public static Object convertSimpleValue(PackageMetaData packageMetaData, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
 			if (instanceClass == Integer.class || instanceClass == int.class) {
-				return Integer.parseInt(value);
+				try {
+					return Integer.parseInt(value);
+				} catch (NumberFormatException e) {
+					try {
+			            new BigInteger(value);
+			        } catch (Exception e1) {
+			            throw e; // re-throw, this was a formatting problem
+			        }
+					throw new NumberFormatException("Input is outside of Integer range (" + value + ")");
+				}
 			} else if (instanceClass == Long.class || instanceClass == long.class) {
 				return Long.parseLong(value);
 			} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
