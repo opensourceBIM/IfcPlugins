@@ -16,6 +16,10 @@ package org.bimserver.ifc.compare;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bimserver.emf.PackageMetaData;
 
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
@@ -23,8 +27,11 @@ import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.modelcompare.ModelCompare;
 import org.bimserver.plugins.modelcompare.ModelCompareException;
 import org.bimserver.plugins.modelcompare.ModelComparePlugin;
+import org.bimserver.plugins.objectidms.HideAllInversesObjectIDM;
+import org.bimserver.plugins.objectidms.ObjectIDM;
 import org.bimserver.plugins.objectidms.ObjectIDMException;
 import org.bimserver.shared.exceptions.PluginException;
+import org.eclipse.emf.ecore.EPackage;
 
 public class NameBasedModelComparePlugin implements ModelComparePlugin {
 
@@ -36,12 +43,11 @@ public class NameBasedModelComparePlugin implements ModelComparePlugin {
 	}
 
 	@Override
-	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration) throws ModelCompareException {
-		try {
-			return new NameBasedModelCompare(pluginContext.getDefaultObjectIDM());
-		} catch (ObjectIDMException e) {
-			throw new ModelCompareException(e);
-		}
+	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration, PackageMetaData packageMetaData) throws ModelCompareException {
+		Set<EPackage> packages = new HashSet<>();
+		packages.add(packageMetaData.getEPackage());
+		ObjectIDM objectIDM = new HideAllInversesObjectIDM(packages, packageMetaData);
+		return new NameBasedModelCompare(objectIDM);
 	}
 
 	@Override

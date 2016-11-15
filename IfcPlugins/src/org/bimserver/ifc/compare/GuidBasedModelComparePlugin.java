@@ -1,5 +1,10 @@
 package org.bimserver.ifc.compare;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.bimserver.emf.PackageMetaData;
+
 /******************************************************************************
  * Copyright (C) 2009-2016  BIMserver.org
  * 
@@ -23,8 +28,10 @@ import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.modelcompare.ModelCompare;
 import org.bimserver.plugins.modelcompare.ModelCompareException;
 import org.bimserver.plugins.modelcompare.ModelComparePlugin;
+import org.bimserver.plugins.objectidms.HideAllInversesObjectIDM;
 import org.bimserver.plugins.objectidms.ObjectIDMException;
 import org.bimserver.shared.exceptions.PluginException;
+import org.eclipse.emf.ecore.EPackage;
 
 public class GuidBasedModelComparePlugin implements ModelComparePlugin {
 
@@ -36,12 +43,10 @@ public class GuidBasedModelComparePlugin implements ModelComparePlugin {
 	}
 
 	@Override
-	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration) throws ModelCompareException {
-		try {
-			return new GuidBasedModelCompare(pluginContext.getDefaultObjectIDM());
-		} catch (ObjectIDMException e) {
-			throw new ModelCompareException(e);
-		}
+	public ModelCompare createModelCompare(PluginConfiguration pluginConfiguration, PackageMetaData packageMetaData) throws ModelCompareException {
+		Set<EPackage> packages = new HashSet<>();
+		packages.add(packageMetaData.getEPackage());
+		return new GuidBasedModelCompare(new HideAllInversesObjectIDM(packages, packageMetaData));
 	}
 
 	@Override
