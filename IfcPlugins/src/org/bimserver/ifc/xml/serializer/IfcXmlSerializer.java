@@ -38,6 +38,7 @@ import org.bimserver.plugins.serializers.SerializerException;
 import org.bimserver.utils.UTF8PrintWriter;
 import org.eclipse.emf.common.util.AbstractEList;
 import org.eclipse.emf.common.util.Enumerator;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -74,7 +75,10 @@ public abstract class IfcXmlSerializer extends IfcSerializer {
 
 	@Override
 	public boolean write(OutputStream out, ProgressReporter progressReporter) throws SerializerException {
-		if (getMode() == Mode.BODY) {
+		switch (getMode()) {
+		case HEADER:
+			setMode(Mode.BODY);
+		case BODY: {
 			this.out = new UTF8PrintWriter(out);
 			printLineTabbed("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
 			tabs = 0;
@@ -98,8 +102,14 @@ public abstract class IfcXmlSerializer extends IfcSerializer {
 			this.out.flush();
 			setMode(Mode.FINISHED);
 			return true;
-		} else if (getMode() == Mode.FINISHED) {
+		}
+		case FINISHED: {
 			return false;
+		}
+		case FOOTER:
+			return false;
+		default:
+			break;
 		}
 		return false;
 	}
@@ -135,8 +145,7 @@ public abstract class IfcXmlSerializer extends IfcSerializer {
 			EntityDefinition entityBN = getPackageMetaData().getSchemaDefinition().getEntityBN(object.eClass().getName().toUpperCase());
 			Attribute attributeBN = entityBN != null ? entityBN.getAttributeBNWithSuper(structuralFeature.getName()) : null;
 			boolean derived = entityBN.isDerived(structuralFeature.getName());
-			EReference eReference = (EReference)structuralFeature;
-			if (!getPackageMetaData().isInverse(eReference) && !structuralFeature.isDerived() && !derived) {
+			if (structuralFeature instanceof EAttribute || (!getPackageMetaData().isInverse((EReference)structuralFeature) && !structuralFeature.isDerived() && !derived)) {
 				// Because of small deviations in the string/float/string
 				// conversions some float attributes are also stored in the
 				// original string representations. These auxiliary attribute
