@@ -19,11 +19,6 @@ package org.bimserver.ifc.xml.deserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -340,10 +335,19 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 							object.eSet(eStructuralFeature, reference);
 						}
 					} else {
-						// TODO
-						String embeddedFieldName = reader.getLocalName();
-						IdEObject embedded = (IdEObject) model.getPackageMetaData().create((EClass)eStructuralFeature.getEType());
-						object.eSet(eStructuralFeature, embedded);
+//						// TODO
+//						String embeddedFieldName = reader.getLocalName();
+//						if (embeddedFieldName.equals("double-wrapper")) {
+//							List<Double> list = (List<Double>) object.eGet(eStructuralFeature);
+//							list.add(Double.valueOf(reader.getText()));
+//						} else {
+//							EClass eClass = model.getPackageMetaData().getEClass(embeddedFieldName);
+//							if (eClass == null) {
+//								throw new DeserializeException("No type found " + embeddedFieldName);
+//							}
+//							IdEObject embedded = (IdEObject) model.getPackageMetaData().create(eClass);
+//							object.eSet(eStructuralFeature, embedded);
+//						}
 					}
 				} else if (reader.getEventType() == XMLStreamReader.END_ELEMENT) {
 					if (reader.getLocalName().equalsIgnoreCase(fieldName)) {

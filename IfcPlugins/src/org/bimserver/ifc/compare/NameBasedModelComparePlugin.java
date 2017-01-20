@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bimserver.emf.PackageMetaData;
-
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
@@ -29,7 +28,6 @@ import org.bimserver.plugins.modelcompare.ModelCompareException;
 import org.bimserver.plugins.modelcompare.ModelComparePlugin;
 import org.bimserver.plugins.objectidms.HideAllInversesObjectIDM;
 import org.bimserver.plugins.objectidms.ObjectIDM;
-import org.bimserver.plugins.objectidms.ObjectIDMException;
 import org.bimserver.shared.exceptions.PluginException;
 import org.eclipse.emf.ecore.EPackage;
 

@@ -511,17 +511,21 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							try {
 								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Integer.parseInt(value));
 							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid integer value");
+								throw new DeserializeException(lineNumber, value + " is not a valid integer(32) value");
 							}
 						} else if (instanceClass == Long.class || instanceClass == long.class) {
-							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Long.parseLong(value));
+							try {
+								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Long.parseLong(value));
+							} catch (NumberFormatException e) {
+								throw new DeserializeException(lineNumber, value + " is not a valid integer(64) value");
+							}
 						} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), value.equals(".T."));
 						} else if (instanceClass == Double.class || instanceClass == double.class) {
 							try {
 								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Double.parseDouble(value));
 							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid double floating point number");
+								throw new DeserializeException(lineNumber, value + " is not a valid floating point(32) number");
 							}
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
 						} else if (instanceClass == String.class) {

@@ -545,7 +545,11 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private void writeEnum(HashMapVirtualObject object, EStructuralFeature feature) throws SerializerException, IOException {
 		Object val = object.eGet(feature);
 		if (feature.getEType().getName().equals("Tristate")) {
-			IfcParserWriterUtils.writePrimitive(val, outputStream);
+			if (val == null) {
+				print(DOLLAR);
+			} else {
+				IfcParserWriterUtils.writePrimitive(val, outputStream);
+			}
 		} else {
 			if (val == null) {
 				print(DOLLAR);

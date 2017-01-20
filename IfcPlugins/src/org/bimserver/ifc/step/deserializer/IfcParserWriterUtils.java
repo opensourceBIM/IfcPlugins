@@ -40,6 +40,11 @@ import com.google.common.base.Charsets;
 public class IfcParserWriterUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcParserWriterUtils.class);
 	private static final boolean USE_ISO_8859_1 = false;
+	
+	private static final ParserPlan[] plans = new ParserPlan[]{
+		new ParserPlan(new XPass(), new X2Pass(), new X4Pass(), new SPass()),
+		new ParserPlan(new SPass(), new XPass(), new X2Pass(), new X4Pass())
+	};
 
 	public static Object convertSimpleValue(PackageMetaData packageMetaData, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
@@ -123,55 +128,16 @@ public class IfcParserWriterUtils {
 			int index = result.indexOf("''");
 			result = result.substring(0, index) + "'" + result.substring(index + 2);
 		}
-		while (result.contains("\\X\\")) {
-			int index = result.indexOf("\\X\\");
-			int code = Integer.parseInt(result.substring(index + 3, index + 5), 16);
-			ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (code) });
-			CharBuffer decode = Charsets.ISO_8859_1.decode(b);
-			result = result.substring(0, index) + decode.get() + result.substring(index + 5);
-		}
-		while (result.contains("\\X2\\")) {
-			int index = result.indexOf("\\X2\\");
-			int indexOfEnd = result.indexOf("\\X0\\", index);
-			if (indexOfEnd == -1) {
-				throw new DeserializeException(lineNumber, "\\X2\\ not closed with \\X0\\");
-			}
-			if ((indexOfEnd - index) % 4 != 0) {
-				throw new DeserializeException(lineNumber, "Number of hex chars in \\X2\\ definition not divisible by 4");
-			}
+		
+		for (ParserPlan parserPlan : plans) {
 			try {
-				ByteBuffer buffer = ByteBuffer.wrap(Hex.decodeHex(result.substring(index + 4, indexOfEnd).toCharArray()));
-				CharBuffer decode = Charsets.UTF_16BE.decode(buffer);
-				result = result.substring(0, index) + decode.toString() + result.substring(indexOfEnd + 4);
-			} catch (DecoderException e) {
-				throw new DeserializeException(lineNumber, e);
+				result = parserPlan.process(lineNumber, result);
+			} catch (NumberFormatException e) {
+				if (parserPlan == plans[plans.length -1]) {
+					throw e;
+				}
+				// Try the next plan
 			}
-		}
-		while (result.contains("\\X4\\")) {
-			int index = result.indexOf("\\X4\\");
-			int indexOfEnd = result.indexOf("\\X0\\", index);
-			if (indexOfEnd == -1) {
-				throw new DeserializeException(lineNumber, "\\X4\\ not closed with \\X0\\");
-			}
-			if ((indexOfEnd - (index + 4)) % 8 != 0) {
-				throw new DeserializeException(lineNumber, "Number of hex chars in \\X4\\ definition not divisible by 8");
-			}
-			try {
-				ByteBuffer buffer = ByteBuffer.wrap(Hex.decodeHex(result.substring(index + 4, indexOfEnd).toCharArray()));
-				CharBuffer decode = Charset.forName("UTF-32").decode(buffer);
-				result = result.substring(0, index) + decode.toString() + result.substring(indexOfEnd + 4);
-			} catch (DecoderException e) {
-				throw new DeserializeException(lineNumber, e);
-			} catch (UnsupportedCharsetException e) {
-				throw new DeserializeException(lineNumber, "UTF-32 is not supported on your system", e);
-			}
-		}
-		while (result.contains("\\S\\")) {
-			int index = result.indexOf("\\S\\");
-			char x = result.charAt(index + 3);
-			ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (x + 128) });
-			CharBuffer decode = Charsets.ISO_8859_1.decode(b);
-			result = result.substring(0, index) + decode.get() + result.substring(index + 4);
 		}
 		// Replace all \\ with \
 		while (result.contains("\\\\")) {
