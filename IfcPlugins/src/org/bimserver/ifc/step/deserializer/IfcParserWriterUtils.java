@@ -19,6 +19,7 @@ package org.bimserver.ifc.step.deserializer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -233,6 +234,104 @@ public class IfcParserWriterUtils {
 			outputStream.write(("\"0" + Hex.encodeHexString((byte[])val) + "\"").getBytes(Charsets.UTF_8));
 		} else {
 			outputStream.write((val == null ? "$" : val.toString()).getBytes(Charsets.UTF_8));
+		}
+	}
+
+	public static void writePrimitive(Object val, PrintWriter printWriter) throws SerializerException, IOException {
+		if (val.getClass().getSimpleName().equals("Tristate")) {
+			if (val.toString().equals("TRUE")) {
+				printWriter.write(".T.");
+			} else if (val.toString().equals("FALSE")) {
+				printWriter.write(".F.");
+			} else if (val.toString().equals("UNDEFINED")) {
+				printWriter.write(".U.");
+			}
+		} else if (val instanceof Double) {
+			if (((Double)val).isInfinite() || (((Double)val).isNaN())) {
+				LOGGER.info("Serializing infinite or NaN double as 0.0");
+				printWriter.write("0.0");
+			} else {
+				String string = val.toString();
+				if (string.endsWith(".0")) {
+					printWriter.write((string.substring(0, string.length() - 1)));
+				} else {
+					printWriter.write(string);
+				}
+			}
+		} else if (val instanceof Boolean) {
+			Boolean bool = (Boolean)val;
+			if (bool) {
+				printWriter.write(".T.");
+			} else {
+				printWriter.write(".F.");
+			}
+		} else if (val instanceof String) {
+			printWriter.write('\'');
+			String stringVal = (String)val;
+			for (int i=0; i<stringVal.length(); i++) {
+				char c = stringVal.charAt(i);
+				if (c == '\'') {
+					printWriter.write(new char[]{'\'', '\''});
+				} else if (c == '\\') {
+					printWriter.write(new char[]{'\\', '\\'});
+				} else if (c >= 32 && c <= 126) {
+					// ISO 8859-1
+					printWriter.write(new char[]{c});
+				} else if (c < 255) {
+					//  ISO 10646 and ISO 8859-1 are the same < 255 , using ISO_8859_1
+					printWriter.write("\\X\\");
+					printWriter.write(Hex.encodeHex(Charsets.ISO_8859_1.encode(CharBuffer.wrap(new char[]{(char) c})).array(), false));
+				} else {
+					if (USE_ISO_8859_1) {
+						// ISO 8859-1 with -128 offset
+						printWriter.write("\\S\\");
+						printWriter.write((char)Charsets.ISO_8859_1.encode(new String(new char[]{(char) (c - 128)})).get());
+					} else {
+						// The following code has not been tested (2012-04-25)
+						// Use UCS-2 or UCS-4
+						
+						// TODO when multiple sequential characters should be encoded in UCS-2 or UCS-4, we don't really need to add all those \X0\ \X2\ and \X4\ chars
+						if (Character.isLowSurrogate(c)) {
+							throw new SerializerException("Unexpected low surrogate range char");
+						} else if (Character.isHighSurrogate(c)) {
+							// We need UCS-4, this is probably never happening
+							if (i + 1 < stringVal.length()) {
+								char low = stringVal.charAt(i + 1);
+								if (!Character.isLowSurrogate(low)) {
+									throw new SerializerException("High surrogate char should be followed by char in low surrogate range");
+								}
+								try {
+									printWriter.write("\\X4\\");
+									printWriter.write(Hex.encodeHex(Charset.forName("UTF-32").encode(new String(new char[]{c, low})).array(), false));
+									printWriter.write("\\X0\\");
+								} catch (UnsupportedCharsetException e) {
+									throw new SerializerException(e);
+								}
+								i++;
+							} else {
+								throw new SerializerException("High surrogate char should be followed by char in low surrogate range, but end of string reached");
+							}
+						} else {
+							// UCS-2 will do
+							printWriter.write(("\\X2\\"));
+							printWriter.write(Hex.encodeHex(Charsets.UTF_16BE.encode(CharBuffer.wrap(new char[]{c})).array(), false));
+							printWriter.write("\\X0\\");
+						}
+					}
+				}
+			}
+			printWriter.write('\'');
+		} else if (val instanceof Enumerator) {
+			printWriter.write(".");
+			printWriter.write(val.toString());
+			printWriter.write(".");
+		} else if (val instanceof byte[]) {
+			// TODO printing default leading 0, must be wrong
+			printWriter.write("\"0");
+			printWriter.write(Hex.encodeHexString((byte[])val));
+			printWriter.write("\"");
+		} else {
+			printWriter.write((val == null ? "$" : val.toString()));
 		}
 	}
 }

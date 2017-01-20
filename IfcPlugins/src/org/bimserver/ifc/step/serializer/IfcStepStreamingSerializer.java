@@ -20,9 +20,9 @@ package org.bimserver.ifc.step.serializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +44,7 @@ import org.bimserver.shared.HashMapVirtualObject;
 import org.bimserver.shared.HashMapWrappedVirtualObject;
 import org.bimserver.shared.MinimalVirtualObject;
 import org.bimserver.utils.StringUtils;
+import org.bimserver.utils.UTF8PrintWriter;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
@@ -53,13 +54,11 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 
-import com.google.common.base.Charsets;
-
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.SchemaDefinition;
 
 public abstract class IfcStepStreamingSerializer implements StreamingSerializer, StreamingReader, OidConvertingSerializer {
-	private static final byte[] NEW_LINE = "\n".getBytes(Charsets.UTF_8);
 	private static final EcorePackage ECORE_PACKAGE_INSTANCE = EcorePackage.eINSTANCE;
 	private static final String NULL = "NULL";
 	private static final String OPEN_CLOSE_PAREN = "()";
@@ -79,7 +78,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private String headerSchema;
 	private ObjectProvider objectProvider;
 	
-	private Map<Long, Integer> oidToEid = new HashMap<>();
+	private Long2IntOpenHashMap oidToEid = new Long2IntOpenHashMap();
 	private int oidCounter = 1;
 
 	protected static enum Mode {
@@ -89,11 +88,11 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private Mode mode = Mode.HEADER;
 	private IfcHeader ifcHeader;
 	private PackageMetaData packageMetaData;
-	private OutputStream outputStream;
+	private PrintWriter printWriter;
 	
 	@Override
 	public boolean write(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
-		this.outputStream = outputStream;
+		this.printWriter = new UTF8PrintWriter(outputStream);
 		boolean result = false;
 		try {
 			result = processMode();
@@ -135,7 +134,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	}
 	
 	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
-		this.outputStream = outputStream;
+		this.printWriter = new UTF8PrintWriter(outputStream);
 		try {
 			while (mode != Mode.FINISHED) {
 				processMode();			
@@ -195,12 +194,11 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	}
 
 	private void println(String line) throws IOException {
-		outputStream.write(line.getBytes(Charsets.UTF_8));
-		outputStream.write(NEW_LINE, 0, NEW_LINE.length);
+		printWriter.println(line);
 	}
 
 	private void print(String text) throws IOException {
-		outputStream.write(text.getBytes(Charsets.UTF_8));
+		printWriter.write(text);
 	}
 	
 	private void write(HashMapVirtualObject object) throws SerializerException, IOException {
@@ -260,12 +258,13 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	}
 
 	private int getExpressId(long oid) {
-		Integer eid = oidToEid.get(oid);
-		if (eid == null ) {
-			eid = oidCounter++;
+		if (oidToEid.containsKey(oid)) {
+			return oidToEid.get(oid);
+		} else {
+			int eid = oidCounter++;
 			oidToEid.put(oid, eid);
+			return eid;
 		}
-		return eid;
 	}
 
 	private void writeEDataType(HashMapVirtualObject object, EntityDefinition entityBN, EStructuralFeature feature) throws SerializerException, IOException {
@@ -336,7 +335,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 				String asString = (String) object.eGet(asStringFeature);
 				writeDoubleValue((Double)ref, asString, feature);
 			} else {
-				IfcParserWriterUtils.writePrimitive(ref, outputStream);
+				IfcParserWriterUtils.writePrimitive(ref, printWriter);
 			}
 		}
 	}
@@ -346,7 +345,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			print((String)asString);
 			return;
 		}
-		IfcParserWriterUtils.writePrimitive(value, outputStream);
+		IfcParserWriterUtils.writePrimitive(value, printWriter);
 	}
 
 	private void writeEmbedded(HashMapWrappedVirtualObject eObject) throws SerializerException, IOException {
@@ -361,7 +360,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 				String asString = (String) eObject.eGet(asStringFeature);
 				writeDoubleValue((Double)realVal, asString, structuralFeature);
 			} else {
-				IfcParserWriterUtils.writePrimitive(realVal, outputStream);
+				IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 			}
 		}
 		print(CLOSE_PAREN);
@@ -415,10 +414,10 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 									if (stringVal != null) {
 										print((String) stringVal);
 									} else {
-										IfcParserWriterUtils.writePrimitive(realVal, outputStream);
+										IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 									}
 								} else {
-									IfcParserWriterUtils.writePrimitive(realVal, outputStream);
+									IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 								}
 							} else if (listObject instanceof HashMapWrappedVirtualObject) {
 								HashMapWrappedVirtualObject eObject = (HashMapWrappedVirtualObject) listObject;
@@ -433,7 +432,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 										String asString = (String) eObject.eGet(asStringFeature);
 										writeDoubleValue((Double)realVal, asString, structuralFeature);
 									} else {
-										IfcParserWriterUtils.writePrimitive(realVal, outputStream);
+										IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 									}
 									print(CLOSE_PAREN);
 								} else {
@@ -448,15 +447,15 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 									if (index < doubleStingList.size()) {
 										String val = (String)doubleStingList.get(index);
 										if (val == null) {
-											IfcParserWriterUtils.writePrimitive(listObject, outputStream);
+											IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 										} else {
 											print(val);
 										}
 									} else {
-										IfcParserWriterUtils.writePrimitive(listObject, outputStream);
+										IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 									}
 								} else {
-									IfcParserWriterUtils.writePrimitive(listObject, outputStream);
+									IfcParserWriterUtils.writePrimitive(listObject, printWriter);
 								}
 							}
 						}
@@ -487,7 +486,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 						String asString = (String) betweenObject.eGet(asStringFeature);
 						writeDoubleValue((Double)val, asString, feature);
 					} else {
-						IfcParserWriterUtils.writePrimitive(val, outputStream);
+						IfcParserWriterUtils.writePrimitive(val, printWriter);
 					}
 				} else {
 					writeEmbedded(betweenObject);
@@ -515,7 +514,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 						String asString = (String) object2.eGet(asStringFeature);
 						writeDoubleValue((Double)val, asString, structuralFeature);
 					} else {
-						IfcParserWriterUtils.writePrimitive(val, outputStream);
+						IfcParserWriterUtils.writePrimitive(val, printWriter);
 					}
 					first = false;
 				}
@@ -548,7 +547,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			if (val == null) {
 				print(DOLLAR);
 			} else {
-				IfcParserWriterUtils.writePrimitive(val, outputStream);
+				IfcParserWriterUtils.writePrimitive(val, printWriter);
 			}
 		} else {
 			if (val == null) {
