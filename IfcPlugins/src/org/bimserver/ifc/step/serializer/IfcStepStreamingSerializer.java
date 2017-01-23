@@ -92,7 +92,9 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	
 	@Override
 	public boolean write(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
-		this.printWriter = new UTF8PrintWriter(outputStream);
+		if (this.printWriter == null) {
+			this.printWriter = new UTF8PrintWriter(outputStream);
+		}
 		boolean result = false;
 		try {
 			result = processMode();
@@ -158,6 +160,9 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		} else if (getMode() == Mode.FOOTER) {
 			writeFooter();
 			setMode(Mode.FINISHED);
+			if (printWriter != null) {
+				printWriter.flush();
+			}
 		} else if (getMode() == Mode.FINISHED) {
 			return false;
 		}
@@ -203,6 +208,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	
 	private void write(HashMapVirtualObject object) throws SerializerException, IOException {
 //		throw new SerializerException("test");
+
 		EClass eClass = object.eClass();
 		if (eClass.getEAnnotation("hidden") != null) {
 			return;
@@ -399,7 +405,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 					if (!first) {
 						print(COMMA);
 					}
-					if (listObject instanceof Long) {
+					if (feature instanceof EReference && listObject instanceof Long) {
 						print(DASH);
 						print(String.valueOf(getExpressId((Long)listObject)));
 					} else {
