@@ -27,7 +27,6 @@ import java.util.List;
 import org.bimserver.emf.IdEObject;
 import org.bimserver.ifc.IfcSerializer;
 import org.bimserver.ifc.step.deserializer.IfcParserWriterUtils;
-import org.bimserver.models.ifc2x3tc1.IfcSite;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.ProgressReporter;
