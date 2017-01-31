@@ -29,13 +29,16 @@ import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ObjectProvider;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
+import org.bimserver.plugins.serializers.SerializerInputstream;
+import org.bimserver.plugins.serializers.StreamingReader;
 import org.bimserver.plugins.serializers.StreamingSerializer;
 
-public class StreamingJsonSerializer implements StreamingSerializer {
+public class StreamingJsonSerializer implements StreamingSerializer, StreamingReader {
 
 	private ObjectProvider objectProvider;
 	private IfcHeader ifcHeader;
 	private PluginConfiguration pluginConfiguration;
+	private SharedJsonStreamingSerializer sharedJsonStreamingSerializer;
 
 	public StreamingJsonSerializer(PluginConfiguration pluginConfiguration) {
 		this.pluginConfiguration = pluginConfiguration;
@@ -45,11 +48,11 @@ public class StreamingJsonSerializer implements StreamingSerializer {
 	public void init(ObjectProvider objectProvider, ProjectInfo projectInfo, IfcHeader ifcHeader, PluginManagerInterface pluginManager, PackageMetaData packageMetaData) throws SerializerException {
 		this.objectProvider = objectProvider;
 		this.ifcHeader = ifcHeader;
+		sharedJsonStreamingSerializer = new SharedJsonStreamingSerializer(objectProvider, ifcHeader, true);
 	}
 
 	@Override
 	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
-		SharedJsonStreamingSerializer sharedJsonStreamingSerializer = new SharedJsonStreamingSerializer(objectProvider, ifcHeader, true);
 		
 		boolean result = sharedJsonStreamingSerializer.write(outputStream);
 		while (result) {
@@ -59,6 +62,11 @@ public class StreamingJsonSerializer implements StreamingSerializer {
 
 	@Override
 	public InputStream getInputStream() {
-		return null;
+		return new SerializerInputstream(this);
+	}
+
+	@Override
+	public boolean write(OutputStream out) throws SerializerException, BimserverDatabaseException {
+		return sharedJsonStreamingSerializer.write(out);
 	}
 }
