@@ -299,6 +299,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
 				tokenizer.zoomIn("(", ")");
 				filterComments(tokenizer);
+				if (tokenizer.nextIsDollar()) {
+					throw new DeserializeException("FILE_NAME.name is not an optional field, but $ used");
+				}
 				ifcHeader.setFilename(tokenizer.readSingleQuoted());
 				SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss");
 				tokenizer.readComma();
