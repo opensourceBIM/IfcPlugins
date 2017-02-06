@@ -58,8 +58,6 @@ import org.bimserver.shared.WrappedVirtualObject;
 import org.bimserver.shared.exceptions.BimServerClientException;
 import org.bimserver.utils.FakeClosingInputStream;
 import org.bimserver.utils.StringUtils;
-import org.bimserver.utils.TokenizeException;
-import org.bimserver.utils.Tokenizer;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -165,14 +163,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		}
 	}
 
-	private void filterComments(Tokenizer tokenizer) throws TokenizeException {
-		if (tokenizer.startsWith("/*")) {
-			tokenizer.zoomIn("/*", "*/");
-			tokenizer.readAll();
-			tokenizer.zoomOut();
-		}
-	}
-	
 	private long read(InputStream inputStream, long fileSize) throws DeserializeException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
 		long bytesRead = 0;
@@ -279,69 +269,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 			}
 			if (line.startsWith("FILE_DESCRIPTION")) {
-				Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
-				tokenizer.zoomIn("(", ")");
-				tokenizer.zoomIn("(", ")");
-				filterComments(tokenizer);
-				while (!tokenizer.isEmpty()) {
-					ifcHeader.getDescription().add(tokenizer.readSingleQuoted());
-					if (tokenizer.nextIsAComma()) {
-						tokenizer.readComma();
-					}
-				}
-				tokenizer.zoomOut();
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				ifcHeader.setImplementationLevel(tokenizer.readSingleQuoted());
-				tokenizer.zoomOut();
-				tokenizer.shouldBeFinished();
+				new IfcHeaderParser().parseDescription(line, ifcHeader);
 			} else if (line.startsWith("FILE_NAME")) {
-				Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
-				tokenizer.zoomIn("(", ")");
-				filterComments(tokenizer);
-				if (tokenizer.nextIsDollar()) {
-					throw new DeserializeException("FILE_NAME.name is not an optional field, but $ used");
-				}
-				ifcHeader.setFilename(tokenizer.readSingleQuoted());
-				SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss");
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				ifcHeader.setTimeStamp(dateFormatter.parse(tokenizer.readSingleQuoted()));
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				tokenizer.zoomIn("(", ")");
-				while (!tokenizer.isEmpty()) {
-					ifcHeader.getAuthor().add(tokenizer.readSingleQuoted());
-					if (tokenizer.nextIsAComma()) {
-						tokenizer.readComma();
-					}
-				}
-				tokenizer.zoomOut();
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				tokenizer.zoomIn("(", ")");
-				while (!tokenizer.isEmpty()) {
-					ifcHeader.getOrganization().add(tokenizer.readSingleQuoted());
-					if (tokenizer.nextIsAComma()) {
-						tokenizer.readComma();
-					}
-				}
-				tokenizer.zoomOut();
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				ifcHeader.setPreProcessorVersion(tokenizer.readSingleQuoted());
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				ifcHeader.setOriginatingSystem(tokenizer.readSingleQuoted());
-				tokenizer.readComma();
-				filterComments(tokenizer);
-				if (tokenizer.nextIsDollar()) {
-					tokenizer.readDollar();
-				} else {
-					ifcHeader.setAuthorization(tokenizer.readSingleQuoted());
-				}
-				tokenizer.zoomOut();
-				tokenizer.shouldBeFinished();
+				new IfcHeaderParser().parseFileName(line, ifcHeader);
 			} else if (line.startsWith("FILE_SCHEMA")) {
 				Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
 				String ifcSchemaVersion = tokenizer.zoomIn("(", ")").zoomIn("(", ")").readSingleQuoted();
