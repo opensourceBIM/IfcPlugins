@@ -11,6 +11,7 @@
 	<description>BIMserver plugin that provides IFC serializers/deserializers</description>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
 		<resources>
 			<resource>
 				<targetPath>plugin</targetPath>
