@@ -9,91 +9,52 @@ import org.bimserver.plugins.deserializers.DeserializeException;
 
 public class IfcHeaderParser {
 
-	private void filterComments(Tokenizer tokenizer) throws TokenizeException {
-		if (tokenizer.startsWith("/*")) {
-			tokenizer.zoomIn("/*", "*/");
-			tokenizer.readAll();
-			tokenizer.zoomOut();
-		}
-	}
-
-	public IfcHeader parseFileName(String line) throws TokenizeException, DeserializeException, ParseException {
+	public IfcHeader parseFileName(String line) throws DeserializeException, ParseException {
 		IfcHeader ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 		parseFileName(line, ifcHeader);
 		return ifcHeader;
 	}
 	
-	public IfcHeader parseDescription(String line) throws TokenizeException, DeserializeException, ParseException {
+	public IfcHeader parseDescription(String line) throws DeserializeException, ParseException {
 		IfcHeader ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 		parseDescription(line, ifcHeader);
 		return ifcHeader;
 	}
 	
-	public void parseDescription(String line, IfcHeader ifcHeader) throws TokenizeException, DeserializeException, ParseException {
-		Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
-		tokenizer.zoomIn("(", ")");
-		tokenizer.zoomIn("(", ")");
-		filterComments(tokenizer);
-		while (!tokenizer.isEmpty()) {
-			ifcHeader.getDescription().add(tokenizer.readSingleQuoted());
-			if (tokenizer.nextIsAComma()) {
-				tokenizer.readComma();
-			}
+	public void parseDescription(String line, IfcHeader ifcHeader) throws DeserializeException, ParseException {
+		line = line.replace("\r\n", "");
+
+		StepParser stepParser = new StepParser(line);
+		StepParser startList = stepParser.startList();
+		while (startList.hasMoreListItems()) {
+			ifcHeader.getDescription().add(startList.readNextString());
 		}
-		tokenizer.zoomOut();
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		ifcHeader.setImplementationLevel(tokenizer.readSingleQuoted());
-		tokenizer.zoomOut();
-		tokenizer.shouldBeFinished();
+		ifcHeader.setImplementationLevel(stepParser.readNextString());
 	}
 	
-	public void parseFileName(String line, IfcHeader ifcHeader) throws TokenizeException, DeserializeException, ParseException {
-		Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
-		tokenizer.zoomIn("(", ")");
-		filterComments(tokenizer);
-		if (tokenizer.nextIsDollar()) {
-			throw new DeserializeException("FILE_NAME.name is not an optional field, but $ used");
-		}
-		ifcHeader.setFilename(tokenizer.readSingleQuoted());
+	public void parseFileName(String line, IfcHeader ifcHeader) throws DeserializeException, ParseException {
+		line = line.replace("\r\n", "");
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss");
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		ifcHeader.setTimeStamp(dateFormatter.parse(tokenizer.readSingleQuoted()));
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		tokenizer.zoomIn("(", ")");
-		while (!tokenizer.isEmpty()) {
-			ifcHeader.getAuthor().add(tokenizer.readSingleQuoted());
-			if (tokenizer.nextIsAComma()) {
-				tokenizer.readComma();
-			}
+
+		StepParser stepParser = new StepParser(line);
+		ifcHeader.setFilename(stepParser.readNextString());
+		ifcHeader.setTimeStamp(dateFormatter.parse(stepParser.readNextString()));
+		StepParser startList = stepParser.startList();
+		while (startList.hasMoreListItems()) {
+			ifcHeader.getAuthor().add(startList.readNextString());
 		}
-		tokenizer.zoomOut();
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		tokenizer.zoomIn("(", ")");
-		while (!tokenizer.isEmpty()) {
-			ifcHeader.getOrganization().add(tokenizer.readSingleQuoted());
-			if (tokenizer.nextIsAComma()) {
-				tokenizer.readComma();
-			}
+		startList = stepParser.startList();
+		while (startList.hasMoreListItems()) {
+			ifcHeader.getOrganization().add(startList.readNextString());
 		}
-		tokenizer.zoomOut();
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		ifcHeader.setPreProcessorVersion(tokenizer.readSingleQuoted());
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		ifcHeader.setOriginatingSystem(tokenizer.readSingleQuoted());
-		tokenizer.readComma();
-		filterComments(tokenizer);
-		if (tokenizer.nextIsDollar()) {
-			tokenizer.readDollar();
-		} else {
-			ifcHeader.setAuthorization(tokenizer.readSingleQuoted());
-		}
-		tokenizer.zoomOut();
-		tokenizer.shouldBeFinished();		
+		ifcHeader.setPreProcessorVersion(stepParser.readNextString());
+		ifcHeader.setOriginatingSystem(stepParser.readNextString());
+		ifcHeader.setAuthorization(stepParser.readNextString());
+	}
+
+	public void parseFileSchema(String line, IfcHeader ifcHeader) throws DeserializeException {
+		line = line.replace("\r\n", "");
+		StepParser stepParser = new StepParser(line);
+		ifcHeader.setIfcSchemaVersion(stepParser.readNextString());
 	}
 }

@@ -25,7 +25,6 @@ import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -269,12 +268,13 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 			}
 			if (line.startsWith("FILE_DESCRIPTION")) {
-				new IfcHeaderParser().parseDescription(line, ifcHeader);
+				new IfcHeaderParser().parseDescription(line.substring("FILE_DESCRIPTION".length() + 1, line.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_NAME")) {
-				new IfcHeaderParser().parseFileName(line, ifcHeader);
+				new IfcHeaderParser().parseFileName(line.substring("FILE_NAME".length() + 1, line.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_SCHEMA")) {
-				Tokenizer tokenizer = new Tokenizer(line.substring(line.indexOf("(")));
-				String ifcSchemaVersion = tokenizer.zoomIn("(", ")").zoomIn("(", ")").readSingleQuoted();
+				new IfcHeaderParser().parseFileSchema(line.substring("FILE_SCHEMA".length() + 1, line.length() - 2), ifcHeader);
+
+				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
 				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
 					throw new DeserializeException(lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
 				}
@@ -282,8 +282,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			} else if (line.startsWith("ENDSEC;")) {
 				// Do nothing
 			}
-		} catch (TokenizeException e) {
-			throw new DeserializeException(lineNumber, e);
 		} catch (ParseException e) {
 			throw new DeserializeException(lineNumber, e);
 		}

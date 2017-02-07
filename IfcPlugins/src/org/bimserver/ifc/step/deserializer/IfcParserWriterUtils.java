@@ -133,6 +133,7 @@ public class IfcParserWriterUtils {
 		for (ParserPlan parserPlan : plans) {
 			try {
 				result = parserPlan.process(lineNumber, result);
+				break;
 			} catch (NumberFormatException e) {
 				if (parserPlan == plans[plans.length -1]) {
 					throw e;

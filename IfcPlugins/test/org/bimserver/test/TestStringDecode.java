@@ -16,8 +16,8 @@ public class TestStringDecode {
                         // Nordic character in UTF-32:
                         Assert.assertEquals("Vaffelrøre", IfcParserWriterUtils.readString("'Vaffelr\\X4\\000000F8\\X0\\re'", 0));
                         
-            System.out.println(IfcParserWriterUtils.readString("'\\S\\E\\S\\d\\S\\h\\S\\m\\S\\h\\S\\v\\S\\`'", 0));
-            System.out.println(IfcParserWriterUtils.readString("'\\S\\X\\S\\r\\S\\s\\S\\j'", 0));
+            Assert.assertEquals("Åäèíèöà", IfcParserWriterUtils.readString("'\\S\\E\\S\\d\\S\\h\\S\\m\\S\\h\\S\\v\\S\\`'", 0));
+            Assert.assertEquals("Øòóê", IfcParserWriterUtils.readString("'\\S\\X\\S\\r\\S\\s\\S\\j'", 0));
 		} catch (DeserializeException e) {
 			Assert.fail(e.getMessage());
 		}
