@@ -246,15 +246,16 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 				model.getModelMetaData().setIfcHeader(ifcHeader);
 			}
+			
 			if (line.startsWith("FILE_DESCRIPTION")) {
-				IfcHeaderParser ifcHeaderParser = new IfcHeaderParser();
-				ifcHeaderParser.parseDescription(line, ifcHeader);
+				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
+				new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_NAME")) {
-				IfcHeaderParser ifcHeaderParser = new IfcHeaderParser();
-				ifcHeaderParser.parseFileName(line, ifcHeader);
+				String filename = line.substring("FILE_NAME".length()).trim();
+				new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_SCHEMA")) {
-				IfcHeaderParser ifcHeaderParser = new IfcHeaderParser();
-				ifcHeaderParser.parseFileSchema(line, ifcHeader);
+				String fileschema = line.substring("FILE_SCHEMA".length()).trim();
+				new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
 
 				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
 				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {

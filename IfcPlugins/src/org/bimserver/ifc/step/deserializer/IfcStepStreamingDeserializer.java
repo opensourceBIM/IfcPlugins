@@ -268,11 +268,14 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 			}
 			if (line.startsWith("FILE_DESCRIPTION")) {
-				new IfcHeaderParser().parseDescription(line.substring("FILE_DESCRIPTION".length() + 1, line.length() - 2), ifcHeader);
+				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
+				new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_NAME")) {
-				new IfcHeaderParser().parseFileName(line.substring("FILE_NAME".length() + 1, line.length() - 2), ifcHeader);
+				String filename = line.substring("FILE_NAME".length()).trim();
+				new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
 			} else if (line.startsWith("FILE_SCHEMA")) {
-				new IfcHeaderParser().parseFileSchema(line.substring("FILE_SCHEMA".length() + 1, line.length() - 2), ifcHeader);
+				String fileschema = line.substring("FILE_SCHEMA".length()).trim();
+				new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
 
 				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
 				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
