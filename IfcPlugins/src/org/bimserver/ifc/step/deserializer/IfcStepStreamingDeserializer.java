@@ -319,9 +319,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (eClass == null) {
 			throw new DeserializeException(lineNumber, name + " is not a known entity");
 		}
-		
+
 		VirtualObject object = newVirtualObject(eClass, line.length());
-		
+
 		AtomicInteger atomicInteger = summaryMap.get(eClass.getName());
 		if (atomicInteger == null) {
 			summaryMap.put(eClass.getName(), new AtomicInteger(1));
@@ -531,6 +531,16 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 								tristate = getPackageMetaData().getEEnumLiteral("Tristate", "UNDEFINED");
 							}
 							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), tristate);
+						} else if (instanceClass.isEnum()) {
+							String realEnumValue = value.substring(1, value.length() - 1);
+							EStructuralFeature feature = newObject.eClass().getEStructuralFeature(WRAPPED_VALUE);
+							EEnumLiteral enumValue = (((EEnumImpl) feature.getEType()).getEEnumLiteral(realEnumValue));
+							if (enumValue == null) {
+								throw new DeserializeException(lineNumber, "Enum type " + feature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
+							}
+							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), enumValue);
+						} else {
+							throw new DeserializeException("Not implemented: " + instanceClass);
 						}
 					}
 					return newObject;
