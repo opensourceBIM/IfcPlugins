@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ifcplugins</artifactId>
 	<groupId>org.opensourcebim</groupId>
-	<version>0.0.21-SNAPSHOT</version>
+	<version>0.0.22</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
@@ -164,7 +164,7 @@
 		<url>https://github.com/opensourceBIM/IfcPlugins.git</url>
 		<connection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</connection>
 		<developerConnection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>ifcplugins-0.0.22</tag>
 	</scm>
 	<organization>
 		<name>OpenSource BIM</name>
