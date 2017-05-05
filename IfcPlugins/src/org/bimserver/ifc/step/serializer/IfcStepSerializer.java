@@ -134,7 +134,7 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 			print("FILE_DESCRIPTION ((");
 			print(StringUtils.concat(ifcHeader.getDescription(), "'", ", "));
 			println("), '" + ifcHeader.getImplementationLevel() + "');");
-			println("FILE_NAME ('" + ifcHeader.getFilename() + "', '" + dateFormatter.format(ifcHeader.getTimeStamp()) + "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), (" + StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '" + ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"	+ ifcHeader.getAuthorization() + "');");
+			println("FILE_NAME ('" + ifcHeader.getFilename().replace("\\", "\\\\") + "', '" + dateFormatter.format(ifcHeader.getTimeStamp()) + "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), (" + StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '" + ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"	+ ifcHeader.getAuthorization() + "');");
 
 			//	println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
