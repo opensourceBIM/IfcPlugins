@@ -355,7 +355,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 									expected++;
 								}
 							}
-							throw new DeserializeException(lineNumber, eClass.getName() + " expects " + expected + " fields, but less found (" + e.getMessage() + ")");
+							throw new DeserializeException(lineNumber, eClass.getName() + " expects " + expected + " fields, but less found (" + e.getMessage() + ")", e);
 						}
 						lastIndex = nextIndex;
 						char firstChar = val.charAt(0);
