@@ -421,6 +421,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	}
 
 	private boolean readList(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
+		if (structuralFeature.getName().equals("Normals")) {
+			System.out.println();
+		}
 		int index = 0;
 		if (!structuralFeature.isMany()) {
 			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + structuralFeature.getEContainingClass().getName() + " is no aggregation");
@@ -464,10 +467,11 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
-					VirtualObject newObject = newVirtualObject((EClass) structuralFeature.getEType(), stringValue.length());
-					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
+					ByteBufferWrappedVirtualObject newObject = new ByteBufferWrappedVirtualObject(null, (EClass) structuralFeature.getEType());
+//					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
 					// TODO unique?
-					object.setListItemReference(structuralFeature, index, newObject.eClass(), newObject.getOid(), -1);
+					
+					object.setListItem(structuralFeature, index, newObject);
 				} else {
 					Object convert = convert(structuralFeature.getEType(), stringValue);
 					if (convert != null) {
