@@ -108,4 +108,10 @@
 		<description>GUID based compare</description>
 		<name>GUID based</name>
 	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.services.ServicePlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifc.compare.CompareService</implementationClass>
+		<description>Calls compare and stores results as IFC model</description>
+		<name>Compare Service</name>
+	</JavaPlugin>
 </PluginDescriptor>

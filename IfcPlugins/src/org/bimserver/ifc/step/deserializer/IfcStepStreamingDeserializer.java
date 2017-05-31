@@ -1,7 +1,7 @@
 package org.bimserver.ifc.step.deserializer;
 
 /******************************************************************************
- * Copyright (C) 2009-2016  BIMserver.org
+ * Copyright (C) 2009-2017  BIMserver.org
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -77,14 +77,14 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private ByteProgressReporter byteProgressReporter;
 	private PackageMetaData packageMetaData;
 	private static final String WRAPPED_VALUE = "wrappedValue";
-	private final WaitingListVirtualObject<Integer> waitingList = new WaitingListVirtualObject<Integer>();
+	private WaitingListVirtualObject<Integer> waitingList;
 	private Mode mode = Mode.HEADER;
 	private int lineNumber;
 	private Schema schema;
 	
 	// ExpressID -> ObjectID
 	// TODO find more efficient implementation
-	private final Map<Integer, Long> mappedObjects = new HashMap<>();
+	private Map<Integer, Long> mappedObjects;
 	private QueryContext reusable;
 	private IfcHeader ifcHeader;
 	
@@ -130,6 +130,8 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	@Override
 	public long read(InputStream in, String filename, long fileSize, QueryContext reusable) throws DeserializeException {
 		this.reusable = reusable;
+		mappedObjects = new HashMap<>();
+		waitingList = new WaitingListVirtualObject<Integer>();
 		mode = Mode.HEADER;
 		if (filename != null && (filename.toUpperCase().endsWith(".ZIP") || filename.toUpperCase().endsWith(".IFCZIP"))) {
 			ZipInputStream zipInputStream = new ZipInputStream(in);
@@ -353,7 +355,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 									expected++;
 								}
 							}
-							throw new DeserializeException(lineNumber, eClass.getName() + " expects " + expected + " fields, but less found (" + e.getMessage() + ")");
+							throw new DeserializeException(lineNumber, eClass.getName() + " expects " + expected + " fields, but less found (" + e.getMessage() + ")", e);
 						}
 						lastIndex = nextIndex;
 						char firstChar = val.charAt(0);

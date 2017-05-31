@@ -1,7 +1,7 @@
 package org.bimserver.ifc.step.serializer;
 
 /******************************************************************************
- * Copyright (C) 2009-2016  BIMserver.org
+ * Copyright (C) 2009-2017  BIMserver.org
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -134,7 +134,7 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 			print("FILE_DESCRIPTION ((");
 			print(StringUtils.concat(ifcHeader.getDescription(), "'", ", "));
 			println("), '" + ifcHeader.getImplementationLevel() + "');");
-			println("FILE_NAME ('" + ifcHeader.getFilename() + "', '" + dateFormatter.format(ifcHeader.getTimeStamp()) + "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), (" + StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '" + ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"	+ ifcHeader.getAuthorization() + "');");
+			println("FILE_NAME ('" + ifcHeader.getFilename().replace("\\", "\\\\") + "', '" + dateFormatter.format(ifcHeader.getTimeStamp()) + "', (" + StringUtils.concat(ifcHeader.getAuthor(), "'", ", ") + "), (" + StringUtils.concat(ifcHeader.getOrganization(), "'", ", ") + "), '" + ifcHeader.getPreProcessorVersion() + "', '" + ifcHeader.getOriginatingSystem() + "', '"	+ ifcHeader.getAuthorization() + "');");
 
 			//	println("FILE_SCHEMA (('" + ifcHeader.getIfcSchemaVersion() + "'));");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
