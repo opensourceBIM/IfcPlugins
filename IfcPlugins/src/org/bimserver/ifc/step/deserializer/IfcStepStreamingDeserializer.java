@@ -48,6 +48,7 @@ import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.StreamingDeserializer;
 import org.bimserver.shared.ByteBufferVirtualObject;
 import org.bimserver.shared.ByteBufferWrappedVirtualObject;
+import org.bimserver.shared.ListCapableVirtualObject;
 import org.bimserver.shared.ListWaitingVirtualObject;
 import org.bimserver.shared.QueryContext;
 import org.bimserver.shared.SingleWaitingVirtualObject;
@@ -372,7 +373,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						} else if (firstChar == '.') {
 							readEnum(val, object, eStructuralFeature);
 						} else if (firstChar == '(') {
-							if (!readList(val, object, eStructuralFeature)) {
+							if (!readList(val, (ListCapableVirtualObject) object, eStructuralFeature)) {
 								openReferences = true;
 							}
 						} else if (firstChar == '*') {
@@ -422,10 +423,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		return reusable.getDatabaseInterface();
 	}
 
-	private boolean readList(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
-		if (structuralFeature.getName().equals("Normals")) {
-			System.out.println();
-		}
+	private boolean readList(String val, ListCapableVirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		int index = 0;
 		if (!structuralFeature.isMany()) {
 			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + structuralFeature.getEContainingClass().getName() + " is no aggregation");
@@ -464,13 +462,13 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						}
 					} else {
 						int pos = object.reserveSpaceForListReference();
-						waitingList.add(referenceId, new ListWaitingVirtualObject(lineNumber, object, structuralFeature, index, pos));
+						waitingList.add(referenceId, new ListWaitingVirtualObject(lineNumber, (VirtualObject) object, structuralFeature, index, pos));
 						complete = false;
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
-					ByteBufferWrappedVirtualObject newObject = new ByteBufferWrappedVirtualObject(null, (EClass) structuralFeature.getEType());
-//					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
+					ByteBufferWrappedVirtualObject newObject = new ByteBufferWrappedVirtualObject(reusable, (EClass) structuralFeature.getEType());
+					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
 					// TODO unique?
 					
 					object.setListItem(structuralFeature, index, newObject);
