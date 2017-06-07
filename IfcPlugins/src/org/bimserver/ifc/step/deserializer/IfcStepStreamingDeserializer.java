@@ -46,6 +46,7 @@ import org.bimserver.plugins.deserializers.ByteProgressReporter;
 import org.bimserver.plugins.deserializers.DatabaseInterface;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.StreamingDeserializer;
+import org.bimserver.shared.ByteBufferList;
 import org.bimserver.shared.ByteBufferVirtualObject;
 import org.bimserver.shared.ByteBufferWrappedVirtualObject;
 import org.bimserver.shared.ListCapableVirtualObject;
@@ -467,9 +468,8 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
-					ByteBufferWrappedVirtualObject newObject = new ByteBufferWrappedVirtualObject(reusable, (EClass) structuralFeature.getEType());
+					ByteBufferList newObject = new ByteBufferList(reusable, (EClass) structuralFeature.getEType());
 					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
-					// TODO unique?
 					
 					object.setListItem(structuralFeature, index, newObject);
 				} else {
