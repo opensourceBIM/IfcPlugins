@@ -40,7 +40,7 @@
 		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifc.step.serializer.Ifc2x3tc1StepStreamingSerializerPlugin</implementationClass>
 		<description>Ifc2x3tc1 Streaming Serializer</description>
-		<name>Ifc2x3tc1 (Streaming)</name>	
+		<name>Ifc2x3tc1 (Streaming)</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
@@ -113,5 +113,11 @@
 		<implementationClass>org.bimserver.ifc.compare.CompareService</implementationClass>
 		<description>Calls compare and stores results as IFC model</description>
 		<name>Compare Service</name>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.renderengine.RenderEnginePlugin</interfaceClass>
+		<implementationClass>org.bimserver.noprenderengine.DefaultNopRenderEngine</implementationClass>
+		<description>No operation render engine</description>
+		<name>NOP Render Engine</name>
 	</JavaPlugin>
 </PluginDescriptor>
