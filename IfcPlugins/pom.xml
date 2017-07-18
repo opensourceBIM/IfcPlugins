@@ -157,7 +157,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.79-SNAPSHOT</version>
+			<version>1.5.80</version>
 		</dependency>
 	</dependencies>
 	<scm>
