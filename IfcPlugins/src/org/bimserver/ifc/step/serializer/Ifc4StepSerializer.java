@@ -30,8 +30,8 @@ public class Ifc4StepSerializer extends IfcStepSerializer {
 	}
 	
 	@Override
-	public void init(IfcModelInterface model, ProjectInfo projectInfo, PluginManagerInterface pluginManager, boolean normalizeOids) throws SerializerException {
+	public void init(IfcModelInterface model, ProjectInfo projectInfo, boolean normalizeOids) throws SerializerException {
 		setHeaderSchema("IFC4");
-		super.init(model, projectInfo, pluginManager, normalizeOids);
+		super.init(model, projectInfo, normalizeOids);
 	}
 }

@@ -27,7 +27,7 @@ import org.bimserver.plugins.deserializers.Deserializer;
 public class Ifc2x3tc1StepDeserializerPlugin extends IfcStepDeserializerPlugin {
 	@Override
 	public Deserializer createDeserializer(PluginConfiguration pluginConfiguration) {
-		return new Ifc2x3tc1StepDeserializer(Schema.IFC2X3TC1);
+		return new Ifc2x3tc1StepDeserializer();
 	}
 	
 	@Override

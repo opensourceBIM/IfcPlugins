@@ -21,7 +21,7 @@ import org.bimserver.emf.Schema;
 
 public class Ifc2x3tc1StepDeserializer extends IfcStepDeserializer {
 
-	public Ifc2x3tc1StepDeserializer(Schema schema) {
-		super(schema);
+	public Ifc2x3tc1StepDeserializer() {
+		super(Schema.IFC2X3TC1);
 	}
 }
