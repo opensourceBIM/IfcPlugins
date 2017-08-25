@@ -19,7 +19,6 @@ package org.bimserver.ifc.step.serializer;
 
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.plugins.PluginConfiguration;
-import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
 
