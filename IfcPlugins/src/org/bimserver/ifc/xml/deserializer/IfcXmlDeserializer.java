@@ -418,6 +418,8 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 			return text;
 		} else if (eType == EcorePackage.eINSTANCE.getEInt()) {
 			return Integer.parseInt(text);
+		} else if (eType == EcorePackage.eINSTANCE.getELong()) {
+			return Long.parseLong(text);
 		} else if (eType == EcorePackage.eINSTANCE.getEDouble()) {
 			return Double.parseDouble(text);
 		} else if (eType == EcorePackage.eINSTANCE.getEBoolean()) {
