@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.bimserver.emf.Schema;
 import org.bimserver.plugins.PluginConfiguration;
+import org.bimserver.plugins.SchemaName;
 import org.bimserver.plugins.serializers.StreamingSerializer;
 
 public class Ifc4StepStreamingSerializerPlugin extends IfcStepStreamingSerializerPlugin {
@@ -37,6 +38,6 @@ public class Ifc4StepStreamingSerializerPlugin extends IfcStepStreamingSerialize
 
 	@Override
 	public String getOutputFormat(Schema schema) {
-		return "IFC_STEP_4";
+		return SchemaName.IFC_STEP_4.name();
 	}
 }
