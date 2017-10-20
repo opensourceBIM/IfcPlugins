@@ -18,7 +18,6 @@ package org.bimserver.ifc.xml.serializer;
  *****************************************************************************/
 
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
 

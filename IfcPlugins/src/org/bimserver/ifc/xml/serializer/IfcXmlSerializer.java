@@ -31,7 +31,6 @@ import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.ifc.IfcSerializer;
 import org.bimserver.models.ifc2x3tc1.Tristate;
 import org.bimserver.models.store.StringType;
-import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ProgressReporter;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;

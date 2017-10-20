@@ -53,7 +53,6 @@ public class StreamingJsonSerializer implements StreamingSerializer, StreamingRe
 
 	@Override
 	public void writeToOutputStream(OutputStream outputStream) throws SerializerException, BimserverDatabaseException {
-		
 		boolean result = sharedJsonStreamingSerializer.write(outputStream);
 		while (result) {
 			result = sharedJsonStreamingSerializer.write(outputStream);

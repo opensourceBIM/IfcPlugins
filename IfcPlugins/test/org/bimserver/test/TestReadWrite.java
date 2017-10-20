@@ -17,7 +17,6 @@ import org.bimserver.ifc.step.serializer.Ifc2x3tc1StepSerializer;
 import org.bimserver.models.ifc2x3tc1.Ifc2x3tc1Package;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.deserializers.DeserializeException;
-import org.bimserver.plugins.serializers.ProgressReporter;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.junit.Test;
 

@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import org.bimserver.emf.IfcModelInterface;
 import org.bimserver.emf.SharedJsonSerializer;
 import org.bimserver.ifc.IfcSerializer;
-import org.bimserver.plugins.PluginManagerInterface;
 import org.bimserver.plugins.serializers.ProgressReporter;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;

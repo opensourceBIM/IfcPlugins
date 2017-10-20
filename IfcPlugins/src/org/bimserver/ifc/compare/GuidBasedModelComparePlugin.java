@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bimserver.emf.PackageMetaData;
-
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
