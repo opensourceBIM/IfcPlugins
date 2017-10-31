@@ -117,7 +117,7 @@
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.renderengine.RenderEnginePlugin</interfaceClass>
 		<implementationClass>org.bimserver.noprenderengine.DefaultNopRenderEngine</implementationClass>
-		<description>No operation render engine</description>
+		<description>No operation render engine (this engine does nothing, for debugging/testing purposes)</description>
 		<name>NOP Render Engine</name>
 	</JavaPlugin>
 </PluginDescriptor>
