@@ -476,7 +476,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							}
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), tristate);
 						} else {
-							throw new DeserializeException(instanceClass.getSimpleName() + " not implemented");
+							throw new DeserializeException(lineNumber, instanceClass.getSimpleName() + " not implemented");
 						}
 					}
 					return newObject;
