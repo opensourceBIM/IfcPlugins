@@ -173,7 +173,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		try {
 			String line = reader.readLine();
 			if (line == null) {
-				throw new DeserializeException("Unexpected end of stream reading first line");
+				throw new DeserializeException(0, "Unexpected end of stream reading first line");
 			}
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			while (line != null) {
@@ -323,7 +323,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (eClass == null) {
 			throw new DeserializeException(lineNumber, name + " is not a known entity");
 		}
-
+		
 		VirtualObject object = newVirtualObject(eClass, line.length());
 
 		AtomicInteger atomicInteger = summaryMap.get(eClass.getName());
@@ -544,7 +544,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							}
 							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), enumValue);
 						} else {
-							throw new DeserializeException("Not implemented: " + instanceClass);
+							throw new DeserializeException(lineNumber, "Not implemented: " + instanceClass);
 						}
 					}
 					return newObject;
