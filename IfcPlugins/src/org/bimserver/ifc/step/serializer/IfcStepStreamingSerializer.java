@@ -207,8 +207,6 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	}
 	
 	private void write(HashMapVirtualObject object) throws SerializerException, IOException {
-//		throw new SerializerException("test");
-
 		EClass eClass = object.eClass();
 		if (eClass.getEAnnotation("hidden") != null) {
 			return;
@@ -390,7 +388,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			}
 			doubleStingList = (List<?>) object.eGet(doubleStringFeature);
 		}
-		if (list.isEmpty() || !object.useFeatureForSerialization(feature)) {
+		if (list.isEmpty() || (!object.useFeatureForSerialization(feature) && feature.getEAnnotation("twodimensionalarray") == null)) {
 			if (!feature.isUnsettable()) {
 				print(OPEN_CLOSE_PAREN);
 			} else {
@@ -401,7 +399,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			boolean first = true;
 			int index = 0;
 			for (Object listObject : list) {
-				if (object.useFeatureForSerialization(feature, index)) {
+				if (object.useFeatureForSerialization(feature, index) || feature.getEAnnotation("twodimensionalarray") != null) {
 					if (!first) {
 						print(COMMA);
 					}
@@ -425,6 +423,9 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 								} else {
 									IfcParserWriterUtils.writePrimitive(realVal, printWriter);
 								}
+							} else if (listObject instanceof HashMapVirtualObject && feature.getEAnnotation("twodimensionalarray") != null) {
+								HashMapVirtualObject td = (HashMapVirtualObject)listObject;
+								writeList(td, td.eClass().getEStructuralFeature("List"));
 							} else if (listObject instanceof HashMapWrappedVirtualObject) {
 								HashMapWrappedVirtualObject eObject = (HashMapWrappedVirtualObject) listObject;
 								EClass class1 = eObject.eClass();
