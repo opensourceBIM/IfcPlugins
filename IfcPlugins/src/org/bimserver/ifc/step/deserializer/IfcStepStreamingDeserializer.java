@@ -40,6 +40,7 @@ import org.bimserver.database.MetricCollector;
 import org.bimserver.emf.MetaDataException;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.emf.Schema;
+import org.bimserver.models.ifc4.Ifc4Package;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
@@ -347,6 +348,12 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				if (getPackageMetaData().useForSerialization(eClass, eStructuralFeature)) {
 					if (getPackageMetaData().useForDatabaseStorage(eClass, eStructuralFeature)) {
 						int nextIndex = StringUtils.nextString(realData, lastIndex);
+						if (nextIndex <= lastIndex && eStructuralFeature == Ifc4Package.eINSTANCE.getIfcSurfaceStyleShading_Transparency()) {
+							// IFC4 add1/add2 hack
+							object.set(eStructuralFeature.getName(), 0D);
+							object.set(eStructuralFeature.getEContainingClass().getEStructuralFeature(eStructuralFeature.getName() + "AsString").getName(), "0");
+							continue;
+						}
 						String val = null;
 						try {
 							val = realData.substring(lastIndex, nextIndex - 1).trim();
@@ -381,7 +388,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							object.eUnset(eStructuralFeature);
 						} else {
 							if (!eStructuralFeature.isMany()) {
-								object.setAttribute(eStructuralFeature, convert(eStructuralFeature.getEType(), val));
+								object.setAttribute(eStructuralFeature, convert(eStructuralFeature, eStructuralFeature.getEType(), val));
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
 									object.setAttribute(doubleStringFeature, val);
@@ -473,7 +480,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					
 					object.setListItem(structuralFeature, index, newObject);
 				} else {
-					Object convert = convert(structuralFeature.getEType(), stringValue);
+					Object convert = convert(structuralFeature, structuralFeature.getEType(), stringValue);
 					if (convert != null) {
 						object.setListItem(structuralFeature, index, convert);
 						if (isDouble) {
@@ -497,7 +504,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		return complete;
 	}
 
-	private Object convert(EClassifier classifier, String value) throws DeserializeException, MetaDataException, BimserverDatabaseException {
+	private Object convert(EStructuralFeature eStructuralFeature, EClassifier classifier, String value) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		if (classifier != null) {
 			if (classifier instanceof EClassImpl) {
 				if (null != ((EClassImpl) classifier).getEStructuralFeature(WRAPPED_VALUE)) {
@@ -549,27 +556,27 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					}
 					return newObject;
 				} else {
-					return processInline(classifier, value);
+					return processInline(eStructuralFeature, value);
 				}
 			} else if (classifier instanceof EDataType) {
-				return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
+				return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), eStructuralFeature, classifier.getInstanceClass(), value, lineNumber);
 			}
 		}
 		return null;
 	}
 
-	private Object processInline(EClassifier classifier, String value) throws DeserializeException, MetaDataException, BimserverDatabaseException {
+	private Object processInline(EStructuralFeature eStructuralFeature, String value) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		if (value.indexOf("(") != -1) {
 			String typeName = value.substring(0, value.indexOf("(")).trim();
 			String v = value.substring(value.indexOf("(") + 1, value.length() - 1);
 			EClassifier eClassifier = getPackageMetaData().getEClassifierCaseInsensitive(typeName);
 			if (eClassifier instanceof EClass) {
-				return convert(eClassifier, v);
+				return convert(eStructuralFeature, eClassifier, v);
 			} else {
 				throw new DeserializeException(lineNumber, typeName + " is not an existing IFC entity");
 			}
 		} else {
-			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
+			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), eStructuralFeature, eStructuralFeature.getEType().getInstanceClass(), value, lineNumber);
 		}
 	}
 
@@ -622,6 +629,13 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				String realEnumValue = val.substring(1, val.length() - 1);
 				EEnumLiteral enumValue = (((EEnumImpl) structuralFeature.getEType()).getEEnumLiteral(realEnumValue));
 				if (enumValue == null) {
+					// Another IFC4/add1/add2 hack
+					if (structuralFeature.getEType() == Ifc4Package.eINSTANCE.getIfcExternalSpatialElementTypeEnum() && realEnumValue.equals("NOTDEFIEND")) {
+						realEnumValue = "NOTDEFINED";
+						enumValue = (((EEnumImpl) structuralFeature.getEType()).getEEnumLiteral(realEnumValue));
+					}
+				}
+				if (enumValue == null) {
 					throw new DeserializeException(lineNumber, "Enum type " + structuralFeature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
 				}
 				object.setAttribute(structuralFeature, enumValue.getInstance());
@@ -632,6 +646,12 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	}
 
 	private boolean readReference(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, BimserverDatabaseException {
+		if (structuralFeature == Ifc4Package.eINSTANCE.getIfcIndexedColourMap_Opacity()) {
+			// HACK for IFC4/add1/add2
+			object.setAttribute(structuralFeature, 0D);
+			object.setAttribute(structuralFeature.getEContainingClass().getEStructuralFeature(structuralFeature.getName() + "AsString"), "0");
+			return true;
+		}
 		try {
 			int referenceId = Integer.parseInt(val.substring(1));
 			if (mappedObjects.containsKey(referenceId)) {

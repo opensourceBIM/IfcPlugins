@@ -38,6 +38,7 @@ import org.bimserver.emf.IfcModelInterfaceException;
 import org.bimserver.emf.MetaDataException;
 import org.bimserver.emf.Schema;
 import org.bimserver.ifc.BasicIfcModel;
+import org.bimserver.models.ifc4.Ifc4Package;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
@@ -305,6 +306,12 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				if (getPackageMetaData().useForSerialization(eClass, eStructuralFeature)) {
 					if (getPackageMetaData().useForDatabaseStorage(eClass, eStructuralFeature)) {
 						int nextIndex = StringUtils.nextString(realData, lastIndex);
+						if (nextIndex <= lastIndex && eStructuralFeature == Ifc4Package.eINSTANCE.getIfcSurfaceStyleShading_Transparency()) {
+							// IFC4 add1/add2 hack
+							object.eSet(eStructuralFeature, 0D);
+							object.eSet(eStructuralFeature.getEContainingClass().getEStructuralFeature(eStructuralFeature.getName() + "AsString"), "0");
+							continue;
+						}
 						String val = null;
 						try {
 							val = realData.substring(lastIndex, nextIndex - 1).trim();
@@ -334,7 +341,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 						} else if (firstChar == '*') {
 						} else {
 							if (!eStructuralFeature.isMany()) {
-								object.eSet(eStructuralFeature, convert(eStructuralFeature.getEType(), val));
+								object.eSet(eStructuralFeature, convert(eStructuralFeature, eStructuralFeature.getEType(), val));
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
 									object.eSet(doubleStringFeature, val);
@@ -414,7 +421,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
 					list.addUnique(newObject);
 				} else {
-					Object convert = convert(structuralFeature.getEType(), stringValue);
+					Object convert = convert(structuralFeature, structuralFeature.getEType(), stringValue);
 					if (convert != null) {
 						while (list.size() <= index) {
 							if (doubleStringList != null) {
@@ -433,7 +440,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		}
 	}
 
-	private Object convert(EClassifier classifier, String value) throws DeserializeException, MetaDataException {
+	private Object convert(EStructuralFeature eStructuralFeature, EClassifier classifier, String value) throws DeserializeException, MetaDataException {
 		if (classifier != null) {
 			if (classifier instanceof EClassImpl) {
 				if (null != ((EClassImpl) classifier).getEStructuralFeature(WRAPPED_VALUE)) {
@@ -481,22 +488,22 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					}
 					return newObject;
 				} else {
-					return processInline(classifier, value);
+					return processInline(eStructuralFeature, classifier, value);
 				}
 			} else if (classifier instanceof EDataType) {
-				return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
+				return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), eStructuralFeature, classifier.getInstanceClass(), value, lineNumber);
 			}
 		}
 		return null;
 	}
 
-	private Object processInline(EClassifier classifier, String value) throws DeserializeException, MetaDataException {
+	private Object processInline(EStructuralFeature eStructuralFeature, EClassifier classifier, String value) throws DeserializeException, MetaDataException {
 		if (value.indexOf("(") != -1) {
 			String typeName = value.substring(0, value.indexOf("(")).trim();
 			String v = value.substring(value.indexOf("(") + 1, value.length() - 1);
 			EClassifier eClassifier = getPackageMetaData().getEClassifierCaseInsensitive(typeName);
 			if (eClassifier instanceof EClass) {
-				Object convert = convert(eClassifier, v);
+				Object convert = convert(eStructuralFeature, eClassifier, v);
 				try {
 					model.add(-1, (IdEObject) convert);
 				} catch (IfcModelInterfaceException e) {
@@ -507,7 +514,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				throw new DeserializeException(lineNumber, typeName + " is not an existing IFC entity");
 			}
 		} else {
-			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), classifier.getInstanceClass(), value, lineNumber);
+			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), eStructuralFeature, classifier.getInstanceClass(), value, lineNumber);
 		}
 	}
 
@@ -560,6 +567,13 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				String realEnumValue = val.substring(1, val.length() - 1);
 				EEnumLiteral enumValue = (((EEnumImpl) structuralFeature.getEType()).getEEnumLiteral(realEnumValue));
 				if (enumValue == null) {
+					// Another IFC4/add1/add2 hack
+					if (structuralFeature.getEType() == Ifc4Package.eINSTANCE.getIfcExternalSpatialElementTypeEnum() && realEnumValue.equals("NOTDEFIEND")) {
+						realEnumValue = "NOTDEFINED";
+						enumValue = (((EEnumImpl) structuralFeature.getEType()).getEEnumLiteral(realEnumValue));
+					}
+				}
+				if (enumValue == null) {
 					throw new DeserializeException(lineNumber, "Enum type " + structuralFeature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
 				}
 				object.eSet(structuralFeature, enumValue.getInstance());
@@ -570,6 +584,13 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 	}
 
 	private void readReference(String val, EObject object, EStructuralFeature structuralFeature) throws DeserializeException {
+		if (structuralFeature == Ifc4Package.eINSTANCE.getIfcIndexedColourMap_Opacity()) {
+			// HACK for IFC4/add1/add2
+			object.eSet(structuralFeature, 0D);
+			object.eSet(structuralFeature.getEContainingClass().getEStructuralFeature(structuralFeature.getName() + "AsString"), "0");
+			return;
+		}
+
 		int referenceId;
 		try {
 			referenceId = Integer.parseInt(val.substring(1));

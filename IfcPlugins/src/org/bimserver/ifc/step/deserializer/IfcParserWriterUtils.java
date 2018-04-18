@@ -30,10 +30,12 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bimserver.emf.IdEObject;
 import org.bimserver.emf.PackageMetaData;
+import org.bimserver.models.ifc4.Ifc4Package;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.eclipse.emf.common.util.Enumerator;
 import org.eclipse.emf.ecore.EEnum;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +50,7 @@ public class IfcParserWriterUtils {
 		new ParserPlan(new SPass(), new XPass(), new X2Pass(), new X4Pass())
 	};
 
-	public static Object convertSimpleValue(PackageMetaData packageMetaData, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
+	public static Object convertSimpleValue(PackageMetaData packageMetaData, EStructuralFeature eStructuralFeature, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
 			if (instanceClass == Integer.class || instanceClass == int.class) {
 				try {
@@ -62,6 +64,10 @@ public class IfcParserWriterUtils {
 					throw new NumberFormatException("Input is outside of Integer range (" + value + ")");
 				}
 			} else if (instanceClass == Long.class || instanceClass == long.class) {
+				if (eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatingPriorities() || eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatedPriorities()) {
+					// HACK to read IFC4 (no add1/add2) files
+					return (long)(100 * Double.parseDouble(value));
+				}
 				return Long.parseLong(value);
 			} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
 				return Boolean.parseBoolean(value);
