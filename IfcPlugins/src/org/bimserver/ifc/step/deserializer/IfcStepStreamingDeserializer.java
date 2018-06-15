@@ -50,6 +50,9 @@ import org.bimserver.plugins.deserializers.StreamingDeserializer;
 import org.bimserver.shared.ByteBufferList;
 import org.bimserver.shared.ByteBufferVirtualObject;
 import org.bimserver.shared.ByteBufferWrappedVirtualObject;
+import org.bimserver.shared.Guid;
+import org.bimserver.shared.GuidCompressor;
+import org.bimserver.shared.InvalidGuidException;
 import org.bimserver.shared.ListCapableVirtualObject;
 import org.bimserver.shared.ListWaitingVirtualObject;
 import org.bimserver.shared.QueryContext;
@@ -388,7 +391,15 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							object.eUnset(eStructuralFeature);
 						} else {
 							if (!eStructuralFeature.isMany()) {
-								object.setAttribute(eStructuralFeature, convert(eStructuralFeature, eStructuralFeature.getEType(), val));
+								Object converted = convert(eStructuralFeature, eStructuralFeature.getEType(), val);
+								object.setAttribute(eStructuralFeature, converted);
+								if (eStructuralFeature.getName().equals("GlobalId")) {
+									try {
+										GuidCompressor.getGuidFromCompressedString(converted.toString(), new Guid());
+									} catch (InvalidGuidException e) {
+										throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\"");
+									}
+								}
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
 									object.setAttribute(doubleStringFeature, val);
