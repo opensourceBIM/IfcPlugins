@@ -109,6 +109,12 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<configuration>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -157,7 +163,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.103-SNAPSHOT</version>
+			<version>1.5.106</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
