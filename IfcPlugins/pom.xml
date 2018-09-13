@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>ifcplugins</artifactId>
 	<groupId>org.opensourcebim</groupId>
-	<version>0.0.35-SNAPSHOT</version>
+	<version>0.0.36-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<timestamp>${maven.build.timestamp}</timestamp>
@@ -109,6 +109,12 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
+								<configuration>
+									<gpgArguments>
+										<arg>--pinentry-mode</arg>
+										<arg>loopback</arg>
+									</gpgArguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -157,7 +163,7 @@
 		<dependency>
 			<groupId>org.opensourcebim</groupId>
 			<artifactId>shared</artifactId>
-			<version>1.5.103-SNAPSHOT</version>
+			<version>1.5.106</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
