@@ -89,7 +89,13 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 				return true;
 			} else if (getMode() == Mode.BODY) {
 				if (iterator.hasNext()) {
-					write(iterator.next());
+					IdEObject next = iterator.next();
+					// TODO this is ugly, there should be a filter in IfcModel
+					// TODO also will cause errors when the last object is not of the right schema...
+					while (next.eClass().getEPackage() != getPackageMetaData().getEPackage() && iterator.hasNext()) {
+						next = iterator.next();
+					}
+					write(next);
 					writeCounter++;
 					if (progressReporter != null) {
 						progressReporter.update(writeCounter, model.size());
