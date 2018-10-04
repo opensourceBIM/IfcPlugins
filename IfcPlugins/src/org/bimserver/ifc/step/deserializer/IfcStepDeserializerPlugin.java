@@ -1,5 +1,9 @@
 package org.bimserver.ifc.step.deserializer;
 
+import java.io.IOException;
+
+import org.bimserver.emf.Schema;
+
 /******************************************************************************
  * Copyright (C) 2009-2018  BIMserver.org
  * 
@@ -19,10 +23,12 @@ package org.bimserver.ifc.step.deserializer;
 
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginContext;
+import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.DeserializerPlugin;
+import org.bimserver.plugins.deserializers.IfcSchemaDeterminer;
 import org.bimserver.shared.exceptions.PluginException;
 
-public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin {
+public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin, IfcSchemaDeterminer {
 
 	@Override
 	public void init(PluginContext pluginContext) throws PluginException {
@@ -35,6 +41,20 @@ public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin {
 
 	@Override
 	public ObjectDefinition getSettingsDefinition() {
+		return null;
+	}
+
+	@Override
+	public Schema determineSchema(byte[] head, boolean usesZip) {
+		DetectIfcVersion detectIfcVersion = new DetectIfcVersion();
+		try {
+			String schema = detectIfcVersion.detectVersion(head, usesZip);
+			return Schema.fromIfcHeader(schema);
+		} catch (DeserializeException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }
