@@ -397,7 +397,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 									try {
 										GuidCompressor.getGuidFromCompressedString(converted.toString(), new Guid());
 									} catch (InvalidGuidException e) {
-										throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\"");
+										throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
 									}
 								}
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
