@@ -27,7 +27,6 @@ import java.util.List;
 import org.bimserver.emf.IdEObject;
 import org.bimserver.ifc.IfcSerializer;
 import org.bimserver.ifc.step.deserializer.IfcParserWriterUtils;
-import org.bimserver.models.ifc2x3tc1.IfcRelDefinesByProperties;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.ProgressReporter;
@@ -184,9 +183,6 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 		boolean isFirst = true;
 		EntityDefinition entityBN = getPackageMetaData().getSchemaDefinition().getEntityBN(object.eClass().getName());
 		for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
-			if (feature.getName().equals("RelatedObjects") && object instanceof IfcRelDefinesByProperties && ((IfcRelDefinesByProperties)object).getGlobalId().equals("0MhdWTb3r9sfPtCdL2CNPV")) {
-				System.out.println();
-			}
 			if (feature.getEAnnotation("hidden") == null && (entityBN != null && (!entityBN.isDerived(feature.getName()) || entityBN.isDerivedOverride(feature.getName())))) {
 				EClassifier type = feature.getEType();
 				if (type instanceof EEnum) {
