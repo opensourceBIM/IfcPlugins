@@ -29,6 +29,7 @@ import java.util.Map;
 import org.bimserver.BimserverDatabaseException;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.ifc.step.deserializer.IfcParserWriterUtils;
+import org.bimserver.models.geometry.GeometryPackage;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginManagerInterface;
@@ -208,6 +209,9 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	
 	private void write(HashMapVirtualObject object) throws SerializerException, IOException {
 		EClass eClass = object.eClass();
+		if (eClass.getEPackage() == GeometryPackage.eINSTANCE) {
+			return;
+		}
 		if (eClass.getEAnnotation("hidden") != null) {
 			return;
 		}
