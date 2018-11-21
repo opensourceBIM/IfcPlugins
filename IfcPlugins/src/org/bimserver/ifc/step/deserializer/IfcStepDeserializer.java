@@ -308,8 +308,10 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 						int nextIndex = StringUtils.nextString(realData, lastIndex);
 						if (nextIndex <= lastIndex && eStructuralFeature == Ifc4Package.eINSTANCE.getIfcSurfaceStyleShading_Transparency()) {
 							// IFC4 add1/add2 hack
-							object.eSet(eStructuralFeature, 0D);
-							object.eSet(eStructuralFeature.getEContainingClass().getEStructuralFeature(eStructuralFeature.getName() + "AsString"), "0");
+							
+							// 21-11-2018 Ruben de Laat: Disabled as it's an optional field, see https://github.com/opensourceBIM/BIMserver/issues/689#issuecomment-383588646
+//							object.eSet(eStructuralFeature, 0D);
+//							object.eSet(eStructuralFeature.getEContainingClass().getEStructuralFeature(eStructuralFeature.getName() + "AsString"), "0");
 							continue;
 						}
 						String val = null;

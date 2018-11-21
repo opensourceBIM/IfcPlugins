@@ -66,7 +66,12 @@ public class IfcParserWriterUtils {
 			} else if (instanceClass == Long.class || instanceClass == long.class) {
 				if (eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatingPriorities() || eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatedPriorities()) {
 					// HACK to read IFC4 (no add1/add2) files
-					return (long)(100 * Double.parseDouble(value));
+					if (value.contains(".")) { // Reals require a decimal point, so we can use that to determine double/int
+						return (long)(100 * Double.parseDouble(value));
+					} else {
+						// No conversion
+						return (long)(Long.parseLong(value));
+					}
 				}
 				return Long.parseLong(value);
 			} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
