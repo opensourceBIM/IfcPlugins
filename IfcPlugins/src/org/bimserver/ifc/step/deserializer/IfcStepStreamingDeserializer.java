@@ -55,6 +55,7 @@ import org.bimserver.shared.GuidCompressor;
 import org.bimserver.shared.InvalidGuidException;
 import org.bimserver.shared.ListCapableVirtualObject;
 import org.bimserver.shared.ListWaitingVirtualObject;
+import org.bimserver.shared.PrimitiveByteBufferList;
 import org.bimserver.shared.QueryContext;
 import org.bimserver.shared.SingleWaitingVirtualObject;
 import org.bimserver.shared.VirtualObject;
@@ -486,10 +487,15 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
-					ByteBufferList newObject = new ByteBufferList(reusable, (EClass) structuralFeature.getEType());
-					readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
-					
-					object.setListItem(structuralFeature, index, newObject);
+					if (structuralFeature.getEType() instanceof EClass) {
+						ByteBufferList newObject = new ByteBufferList(reusable, (EClass) structuralFeature.getEType());
+						readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
+						object.setListItem(structuralFeature, index, newObject);
+					} else {
+						PrimitiveByteBufferList newObject = new PrimitiveByteBufferList(reusable, (EDataType) structuralFeature.getEType());
+						readList(stringValue, newObject, structuralFeature);
+						object.setListItem(structuralFeature, index, newObject);
+					}
 				} else {
 					Object convert = convert(structuralFeature, structuralFeature.getEType(), stringValue);
 					if (convert != null) {
