@@ -54,7 +54,7 @@
     <dependency>
       <groupId>org.opensourcebim</groupId>
       <artifactId>shared</artifactId>
-      <version>1.5.117</version>
+      <version>1.5.118-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>

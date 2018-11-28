@@ -22,6 +22,8 @@ import org.bimserver.plugins.renderengine.RenderEngineException;
 import org.bimserver.plugins.renderengine.RenderEngineGeometry;
 import org.bimserver.plugins.renderengine.RenderEngineInstance;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 public class NopRenderEngineInstance implements RenderEngineInstance {
 
 	@Override
@@ -35,12 +37,7 @@ public class NopRenderEngineInstance implements RenderEngineInstance {
 	}
 
 	@Override
-	public double getArea() throws RenderEngineException {
-		return 0;
-	}
-
-	@Override
-	public double getVolume() throws RenderEngineException {
-		return 0;
+	public ObjectNode getAdditionalData() throws RenderEngineException {
+		return null;
 	}
 }

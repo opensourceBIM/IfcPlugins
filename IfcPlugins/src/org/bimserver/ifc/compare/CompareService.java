@@ -33,7 +33,6 @@ import org.bimserver.interfaces.objects.SService;
 import org.bimserver.models.store.ServiceDescriptor;
 import org.bimserver.plugins.services.AbstractService;
 import org.bimserver.plugins.services.BimServerClientInterface;
-import org.bimserver.plugins.services.Flow;
 import org.bimserver.shared.exceptions.UserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +78,7 @@ public class CompareService extends AbstractService {
 		
 		SService service = bimServerClientInterface.getServiceInterface().getService(soid);
 				
-		bimServerClientInterface.checkin(service.getWriteRevisionId(), "test", suggestedDeserializerForExtension.getOid(), false, Flow.SYNC, -1, "", file.getInputStream());
+		bimServerClientInterface.checkinSync(service.getWriteRevisionId(), "test", suggestedDeserializerForExtension.getOid(), false, -1, "", file.getInputStream());
 	}
 
 	@Override
