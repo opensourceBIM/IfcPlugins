@@ -36,11 +36,11 @@ import org.bimserver.shared.exceptions.PluginException;
 public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
 		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
 
 		ParameterDefinition extensionParameter = StoreFactory.eINSTANCE.createParameterDefinition();
@@ -76,6 +76,11 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 		objectDefinition.getParameters().add(zipExtension);
 		
 		return objectDefinition;
+	}
+	
+	@Override
+	public ObjectDefinition getSystemSettingsDefinition() {
+		return null;
 	}
 
 	@Override

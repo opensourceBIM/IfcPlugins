@@ -23,6 +23,7 @@ import org.bimserver.models.store.PrimitiveDefinition;
 import org.bimserver.models.store.PrimitiveEnum;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.models.store.StringType;
+import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.serializers.StreamingSerializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
@@ -30,7 +31,7 @@ import org.bimserver.shared.exceptions.PluginException;
 public abstract class IfcStepStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 	}
 
 	public String getDefaultContentType() {
@@ -42,7 +43,7 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
 		ObjectDefinition objectDefinition = StoreFactory.eINSTANCE.createObjectDefinition();
 
 		ParameterDefinition extensionParameter = StoreFactory.eINSTANCE.createParameterDefinition();
@@ -91,5 +92,10 @@ public abstract class IfcStepStreamingSerializerPlugin implements StreamingSeria
 		objectDefinition.getParameters().add(zipExtension);
 		
 		return objectDefinition;
+	}
+	
+	@Override
+	public ObjectDefinition getSystemSettingsDefinition() {
+		return null;
 	}
 }

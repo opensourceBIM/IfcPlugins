@@ -22,6 +22,7 @@ import org.bimserver.emf.Schema;
  *****************************************************************************/
 
 import org.bimserver.models.store.ObjectDefinition;
+import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.DeserializerPlugin;
@@ -31,7 +32,7 @@ import org.bimserver.shared.exceptions.PluginException;
 public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin, IfcSchemaDeterminer {
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 	}
 
 	@Override
@@ -40,7 +41,12 @@ public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin, I
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
+		return null;
+	}
+	
+	@Override
+	public ObjectDefinition getSystemSettingsDefinition() {
 		return null;
 	}
 

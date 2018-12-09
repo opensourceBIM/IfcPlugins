@@ -35,7 +35,7 @@ public class JsonSerializerPluginWithGeometry extends AbstractSerializerPlugin {
 	}
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 	}
 
 	@Override
@@ -49,8 +49,8 @@ public class JsonSerializerPluginWithGeometry extends AbstractSerializerPlugin {
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
-		return super.getSettingsDefinition();
+	public ObjectDefinition getUserSettingsDefinition() {
+		return super.getUserSettingsDefinition();
 	}
 	
 	@Override

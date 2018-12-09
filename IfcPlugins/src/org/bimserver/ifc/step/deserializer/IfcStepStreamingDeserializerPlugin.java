@@ -18,6 +18,7 @@ package org.bimserver.ifc.step.deserializer;
  *****************************************************************************/
 
 import org.bimserver.models.store.ObjectDefinition;
+import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.StreamingDeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
@@ -25,7 +26,7 @@ import org.bimserver.shared.exceptions.PluginException;
 public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDeserializerPlugin {
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 	}
 
 	@Override
@@ -34,7 +35,12 @@ public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDes
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
+		return null;
+	}
+	
+	@Override
+	public ObjectDefinition getSystemSettingsDefinition() {
 		return null;
 	}
 }

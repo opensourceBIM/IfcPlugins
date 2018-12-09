@@ -36,7 +36,7 @@ public class GuidBasedModelComparePlugin implements ModelComparePlugin {
 	private PluginContext pluginContext;
 
 	@Override
-	public void init(PluginContext pluginContext) throws PluginException {
+	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
 		this.pluginContext = pluginContext;
 	}
 
@@ -48,7 +48,12 @@ public class GuidBasedModelComparePlugin implements ModelComparePlugin {
 	}
 
 	@Override
-	public ObjectDefinition getSettingsDefinition() {
+	public ObjectDefinition getUserSettingsDefinition() {
+		return null;
+	}
+	
+	@Override
+	public ObjectDefinition getSystemSettingsDefinition() {
 		return null;
 	}
 }
