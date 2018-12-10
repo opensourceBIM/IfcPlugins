@@ -23,6 +23,7 @@ import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.renderengine.RenderEngine;
 import org.bimserver.plugins.renderengine.RenderEngineException;
 import org.bimserver.plugins.renderengine.RenderEnginePlugin;
+import org.bimserver.plugins.renderengine.VersionInfo;
 import org.bimserver.shared.exceptions.PluginException;
 
 public class DefaultNopRenderEngine implements RenderEnginePlugin {
@@ -45,5 +46,10 @@ public class DefaultNopRenderEngine implements RenderEnginePlugin {
 	@Override
 	public RenderEngine createRenderEngine(PluginConfiguration pluginConfiguration, String schema) throws RenderEngineException {
 		return new NopRenderEngine();
+	}
+
+	@Override
+	public VersionInfo getVersionInfo() {
+		return null;
 	}
 }

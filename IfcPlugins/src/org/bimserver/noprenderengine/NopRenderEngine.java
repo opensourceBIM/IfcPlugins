@@ -42,9 +42,4 @@ public class NopRenderEngine implements RenderEngine {
 	@Override
 	public void close() throws RenderEngineException {
 	}
-
-	@Override
-	public String getVersion() {
-		return "No version";
-	}
 }
