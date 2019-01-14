@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.opensourcebim</groupId>
       <artifactId>shared</artifactId>
-      <version>1.5.121-SNAPSHOT</version>
+      <version>1.5.120</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -130,7 +130,7 @@
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
-		  <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
+          <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
         </configuration>
       </plugin>
       <plugin>
