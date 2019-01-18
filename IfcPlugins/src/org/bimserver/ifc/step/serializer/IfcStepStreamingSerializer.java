@@ -142,7 +142,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			while (mode != Mode.FINISHED) {
 				processMode();			
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new SerializerException(e);
 		}
 	}
@@ -430,6 +430,12 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 							} else if (listObject instanceof HashMapVirtualObject && feature.getEAnnotation("twodimensionalarray") != null) {
 								HashMapVirtualObject td = (HashMapVirtualObject)listObject;
 								writeList(td, td.eClass().getEStructuralFeature("List"));
+							} else if (listObject instanceof HashMapVirtualObject) {
+								HashMapVirtualObject td = (HashMapVirtualObject)listObject;
+								print(packageMetaData.getUpperCase(td.eClass()));
+								print(OPEN_PAREN);
+								writeList(td, td.eClass().getEStructuralFeature("wrappedValue"));
+								print(CLOSE_PAREN);
 							} else if (listObject instanceof HashMapWrappedVirtualObject) {
 								HashMapWrappedVirtualObject eObject = (HashMapWrappedVirtualObject) listObject;
 								EClass class1 = eObject.eClass();

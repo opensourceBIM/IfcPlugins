@@ -58,9 +58,9 @@ import org.bimserver.shared.ListWaitingVirtualObject;
 import org.bimserver.shared.PrimitiveByteBufferList;
 import org.bimserver.shared.QueryContext;
 import org.bimserver.shared.SingleWaitingVirtualObject;
+import org.bimserver.shared.TwoDimensionalListWaitingVirtualObject;
 import org.bimserver.shared.VirtualObject;
 import org.bimserver.shared.WaitingListVirtualObject;
-import org.bimserver.shared.WrappedVirtualObject;
 import org.bimserver.shared.exceptions.BimServerClientException;
 import org.bimserver.utils.FakeClosingInputStream;
 import org.bimserver.utils.StringUtils;
@@ -242,7 +242,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				try {
 					waitingList.dumpIfNotEmpty();
 				} catch (BimServerClientException e) {
-					e.printStackTrace();
+					throw new DeserializeException(e);
 				}
 			} else {
 				if (line.length() > 0 && line.charAt(0) == '#') {
@@ -276,6 +276,11 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			if (ifcHeader == null) {
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 			}
+			if (line.startsWith("/*")) {
+				if (line.contains("*/")) {
+					line = line.substring(line.indexOf("*/") + 2);
+				}
+			}
 			if (line.startsWith("FILE_DESCRIPTION")) {
 				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
 				new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
@@ -303,7 +308,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		return new ByteBufferVirtualObject(reusable, eClass, metricCollector.estimateRequiredBytes(lineLength));
 	}
 
-	private WrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
+	private ByteBufferWrappedVirtualObject newWrappedVirtualObject(EClass eClass) {
 		return new ByteBufferWrappedVirtualObject(reusable, eClass);
 	}
 	
@@ -385,7 +390,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						} else if (firstChar == '.') {
 							readEnum(val, object, eStructuralFeature);
 						} else if (firstChar == '(') {
-							if (!readList(val, (ListCapableVirtualObject) object, eStructuralFeature)) {
+							if (!readList(val, (ListCapableVirtualObject) object, eStructuralFeature, object, -1)) {
 								openReferences = true;
 							}
 						} else if (firstChar == '*') {
@@ -443,7 +448,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		return reusable.getDatabaseInterface();
 	}
 
-	private boolean readList(String val, ListCapableVirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
+	private boolean readList(String val, ListCapableVirtualObject object, EStructuralFeature structuralFeature, VirtualObject parentObject, int parentIndex) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		int index = 0;
 		if (!structuralFeature.isMany()) {
 			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + structuralFeature.getEContainingClass().getName() + " is no aggregation");
@@ -482,18 +487,27 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						}
 					} else {
 						int pos = object.reserveSpaceForListReference();
-						waitingList.add(referenceId, new ListWaitingVirtualObject(lineNumber, (VirtualObject) object, structuralFeature, index, pos));
+						if (object instanceof VirtualObject) {
+							waitingList.add(referenceId, new ListWaitingVirtualObject(lineNumber, (VirtualObject) object, structuralFeature, index, pos));
+						} else if (object instanceof ByteBufferList) {
+							if (parentObject == null) {
+								throw new DeserializeException("Need a parentObject");
+							}
+							waitingList.add(referenceId, new TwoDimensionalListWaitingVirtualObject(lineNumber, parentObject, (ByteBufferList) object, structuralFeature, parentIndex, index, pos));
+						}
 						complete = false;
 					}
 				} else if (stringValue.charAt(0) == '(') {
 					// Two dimensional list
 					if (structuralFeature.getEType() instanceof EClass) {
 						ByteBufferList newObject = new ByteBufferList(reusable, (EClass) structuralFeature.getEType());
-						readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"));
+						if (!readList(stringValue, newObject, newObject.eClass().getEStructuralFeature("List"), parentObject, index)) {
+							complete = false;
+						}
 						object.setListItem(structuralFeature, index, newObject);
 					} else {
 						PrimitiveByteBufferList newObject = new PrimitiveByteBufferList(reusable, (EDataType) structuralFeature.getEType());
-						readList(stringValue, newObject, structuralFeature);
+						readList(stringValue, newObject, structuralFeature, parentObject, index);
 						object.setListItem(structuralFeature, index, newObject);
 					}
 				} else {
@@ -525,53 +539,60 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (classifier != null) {
 			if (classifier instanceof EClassImpl) {
 				if (null != ((EClassImpl) classifier).getEStructuralFeature(WRAPPED_VALUE)) {
-					WrappedVirtualObject newObject = newWrappedVirtualObject((EClass) classifier);
-					Class<?> instanceClass = newObject.eClass().getEStructuralFeature(WRAPPED_VALUE).getEType().getInstanceClass();
-					if (value.equals("")) {
-
+					EStructuralFeature wrappedFeature = ((EClass) classifier).getEStructuralFeature(WRAPPED_VALUE);
+					if (wrappedFeature.isMany()) {
+						ByteBufferList object = new ByteBufferList(reusable, (EClass) classifier);
+						readList(value, object, wrappedFeature, null, -1);
+						return object;
 					} else {
-						if (instanceClass == Integer.class || instanceClass == int.class) {
-							try {
-								newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Integer.parseInt(value));
-							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid integer value");
-							}
-						} else if (instanceClass == Long.class || instanceClass == long.class) {
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Long.parseLong(value));
-						} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), value.equals(".T."));
-						} else if (instanceClass == Double.class || instanceClass == double.class) {
-							try {
-								newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Double.parseDouble(value));
-							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid double floating point number");
-							}
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
-						} else if (instanceClass == String.class) {
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), IfcParserWriterUtils.readString(value, lineNumber));
-						} else if (instanceClass.getSimpleName().equals("Tristate")) {
-							Object tristate = null;
-							if (value.equals(".T.")) {
-								tristate = getPackageMetaData().getEEnumLiteral("Tristate", "TRUE");
-							} else if (value.equals(".F.")) {
-								tristate = getPackageMetaData().getEEnumLiteral("Tristate", "FALSE");
-							} else if (value.equals(".U.")) {
-								tristate = getPackageMetaData().getEEnumLiteral("Tristate", "UNDEFINED");
-							}
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), tristate);
-						} else if (instanceClass.isEnum()) {
-							String realEnumValue = value.substring(1, value.length() - 1);
-							EStructuralFeature feature = newObject.eClass().getEStructuralFeature(WRAPPED_VALUE);
-							EEnumLiteral enumValue = (((EEnumImpl) feature.getEType()).getEEnumLiteral(realEnumValue));
-							if (enumValue == null) {
-								throw new DeserializeException(lineNumber, "Enum type " + feature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
-							}
-							newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), enumValue);
+						ByteBufferWrappedVirtualObject newObject = newWrappedVirtualObject((EClass) classifier);
+						Class<?> instanceClass = wrappedFeature.getEType().getInstanceClass();
+						if (value.equals("")) {
+							
 						} else {
-							throw new DeserializeException(lineNumber, "Not implemented: " + instanceClass);
+							if (instanceClass == Integer.class || instanceClass == int.class) {
+								try {
+									newObject.setAttribute(wrappedFeature, Integer.parseInt(value));
+								} catch (NumberFormatException e) {
+									throw new DeserializeException(lineNumber, value + " is not a valid integer value");
+								}
+							} else if (instanceClass == Long.class || instanceClass == long.class) {
+								newObject.setAttribute(wrappedFeature, Long.parseLong(value));
+							} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
+								newObject.setAttribute(wrappedFeature, value.equals(".T."));
+							} else if (instanceClass == Double.class || instanceClass == double.class) {
+								try {
+									newObject.setAttribute(wrappedFeature, Double.parseDouble(value));
+								} catch (NumberFormatException e) {
+									throw new DeserializeException(lineNumber, value + " is not a valid double floating point number");
+								}
+								newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
+							} else if (instanceClass == String.class) {
+								newObject.setAttribute(wrappedFeature, IfcParserWriterUtils.readString(value, lineNumber));
+							} else if (instanceClass.getSimpleName().equals("Tristate")) {
+								Object tristate = null;
+								if (value.equals(".T.")) {
+									tristate = getPackageMetaData().getEEnumLiteral("Tristate", "TRUE");
+								} else if (value.equals(".F.")) {
+									tristate = getPackageMetaData().getEEnumLiteral("Tristate", "FALSE");
+								} else if (value.equals(".U.")) {
+									tristate = getPackageMetaData().getEEnumLiteral("Tristate", "UNDEFINED");
+								}
+								newObject.setAttribute(wrappedFeature, tristate);
+							} else if (instanceClass.isEnum()) {
+								String realEnumValue = value.substring(1, value.length() - 1);
+								EStructuralFeature feature = wrappedFeature;
+								EEnumLiteral enumValue = (((EEnumImpl) feature.getEType()).getEEnumLiteral(realEnumValue));
+								if (enumValue == null) {
+									throw new DeserializeException(lineNumber, "Enum type " + feature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
+								}
+								newObject.setAttribute(wrappedFeature, enumValue);
+							} else {
+								throw new DeserializeException(lineNumber, "Not implemented: " + instanceClass);
+							}
 						}
+						return newObject;
 					}
-					return newObject;
 				} else {
 					return processInline(eStructuralFeature, value);
 				}
