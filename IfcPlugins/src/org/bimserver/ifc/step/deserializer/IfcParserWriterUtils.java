@@ -64,7 +64,7 @@ public class IfcParserWriterUtils {
 					throw new NumberFormatException("Input is outside of Integer range (" + value + ")");
 				}
 			} else if (instanceClass == Long.class || instanceClass == long.class) {
-				if (eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatingPriorities() || eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatedPriorities()) {
+				if (eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatingPriorities() || eStructuralFeature == Ifc4Package.eINSTANCE.getIfcRelConnectsPathElements_RelatedPriorities() || eStructuralFeature == Ifc4Package.eINSTANCE.getIfcMaterialProfile_Priority()) {
 					// HACK to read IFC4 (no add1/add2) files
 					if (value.contains(".")) { // Reals require a decimal point, so we can use that to determine double/int
 						return (long)(100 * Double.parseDouble(value));
