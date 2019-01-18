@@ -27,8 +27,8 @@ public class DetectIfcVersion {
 	private IfcHeader ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 	
 	public static void main(String[] args) {
-		Path path = Paths.get("E:\\Org\\single\\ifc4Mep export 17-12-2013_IFC4.ifc");
-		byte[] head = new byte[2048];
+		Path path = Paths.get("C:\\Bulk\\Single\\beam-standard-case.ifc");
+		byte[] head = new byte[4096];
 		try {
 			IOUtils.readFully(Files.newInputStream(path), head);
 			System.out.println(new DetectIfcVersion().detectVersion(head, false));
@@ -119,6 +119,11 @@ public class DetectIfcVersion {
 	}
 	
 	private boolean processHeader(String line) throws DeserializeException {
+		if (line.startsWith("/*")) {
+			if (line.contains("*/")) {
+				line = line.substring(line.indexOf("*/") + 2);
+			}
+		}
 		if (line.startsWith("FILE_SCHEMA")) {
 			String fileschema = line.substring("FILE_SCHEMA".length()).trim();
 			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
