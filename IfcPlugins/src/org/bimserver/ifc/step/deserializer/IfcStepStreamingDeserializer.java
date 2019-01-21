@@ -73,6 +73,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.impl.EClassImpl;
 import org.eclipse.emf.ecore.impl.EEnumImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
@@ -81,10 +83,11 @@ import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
 
 public abstract class IfcStepStreamingDeserializer implements StreamingDeserializer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(IfcStepStreamingDeserializer.class);
 	private ByteProgressReporter byteProgressReporter;
 	private PackageMetaData packageMetaData;
 	private static final String WRAPPED_VALUE = "wrappedValue";
-	private WaitingListVirtualObject<Integer> waitingList;
+	private WaitingListVirtualObject waitingList;
 	private Mode mode = Mode.HEADER;
 	private int lineNumber;
 	private Schema schema;
@@ -138,7 +141,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	public long read(InputStream in, String filename, long fileSize, QueryContext reusable) throws DeserializeException {
 		this.reusable = reusable;
 		mappedObjects = new HashMap<>();
-		waitingList = new WaitingListVirtualObject<Integer>();
+		waitingList = new WaitingListVirtualObject();
 		mode = Mode.HEADER;
 		if (filename != null && (filename.toUpperCase().endsWith(".ZIP") || filename.toUpperCase().endsWith(".IFCZIP"))) {
 			ZipInputStream zipInputStream = new ZipInputStream(in);
