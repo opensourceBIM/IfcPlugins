@@ -1,5 +1,7 @@
 package org.bimserver.noprenderengine;
 
+import java.nio.ByteBuffer;
+
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
  * 
@@ -21,7 +23,7 @@ import org.bimserver.plugins.renderengine.RenderEngineGeometry;
 
 public class NopRenderEngineGeometry extends RenderEngineGeometry {
 
-	public NopRenderEngineGeometry(int[] indices, float[] vertices, float[] normals, float[] materials, int[] materialIndices) {
+	public NopRenderEngineGeometry(ByteBuffer indices, ByteBuffer vertices, ByteBuffer normals, ByteBuffer materials, ByteBuffer materialIndices) {
 		super(indices, vertices, normals, materials, materialIndices);
 	}
 }

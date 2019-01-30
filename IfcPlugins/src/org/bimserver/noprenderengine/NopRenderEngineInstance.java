@@ -1,5 +1,7 @@
 package org.bimserver.noprenderengine;
 
+import java.nio.ByteBuffer;
+
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
  * 
@@ -33,7 +35,7 @@ public class NopRenderEngineInstance implements RenderEngineInstance {
 
 	@Override
 	public RenderEngineGeometry generateGeometry() throws RenderEngineException {
-		return new NopRenderEngineGeometry(new int[0], new float[0], new float[0], new float[0], new int[0]);
+		return new NopRenderEngineGeometry(ByteBuffer.allocate(0), ByteBuffer.allocate(0), ByteBuffer.allocate(0), ByteBuffer.allocate(0), ByteBuffer.allocate(0));
 	}
 
 	@Override
