@@ -29,6 +29,7 @@ public class XPass extends Pass {
 	@Override
 	public String process(int lineNumber, String result) throws DeserializeException {
 		while (result.contains("\\X\\")) {
+			result = result.replace("\\\\",  "\\");
 			int index = result.indexOf("\\X\\");
 			int code = Integer.parseInt(result.substring(index + 3, index + 5), 16);
 			ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (code) });
