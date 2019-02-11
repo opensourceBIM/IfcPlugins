@@ -37,6 +37,10 @@ public class TestStringDecode {
             Assert.assertEquals("Øòóê", IfcParserWriterUtils.readString("'\\S\\X\\S\\r\\S\\s\\S\\j'", 0));
             
             Assert.assertEquals("转角", IfcParserWriterUtils.readString("'\\X2\\8F6C89D2\\X0\\'", 0));
+
+            Assert.assertEquals("/*", IfcParserWriterUtils.readString("'/*'", 0));
+            Assert.assertEquals("Fläche", IfcParserWriterUtils.readString("'Fl\\X2\\00E4\\X0\\che'", 0));
+            Assert.assertEquals("Länge", IfcParserWriterUtils.readString("'L\\X2\\00E4\\X0\\nge'", 0));
             
             // This string is taken from (and edited) ifc4_add2.ifc, pretty sure the original is invalid though
             Assert.assertEquals("相对于纵轴的旋转角。对全局坐标系中的垂直柱，该属性为相对于轴的角度。（若轮廓方向在轴上，则转角为0。）对全局坐标系中的非垂直柱，该属性为相对于Z轴的角度。（若轮廓方向在Z轴上，则转角为0。）\n" + 
