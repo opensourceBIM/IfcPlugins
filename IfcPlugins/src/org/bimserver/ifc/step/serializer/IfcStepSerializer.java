@@ -47,7 +47,7 @@ import com.google.common.base.Charsets;
 
 import nl.tue.buildingsmart.schema.EntityDefinition;
 
-public abstract class IfcStepSerializer extends IfcSerializer {
+public class IfcStepSerializer extends IfcSerializer {
 	private static final byte[] NEW_LINE = "\n".getBytes(Charsets.UTF_8);
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(IfcStepSerializer.class);
 	private static final EcorePackage ECORE_PACKAGE_INSTANCE = EcorePackage.eINSTANCE;
@@ -74,7 +74,7 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 	public IfcStepSerializer(PluginConfiguration pluginConfiguration) {
 	}
 
-	protected void setHeaderSchema(String headerSchema) {
+	public void setHeaderSchema(String headerSchema) {
 		this.headerSchema = headerSchema;
 	}
 	
@@ -165,6 +165,9 @@ public abstract class IfcStepSerializer extends IfcSerializer {
 	private void write(IdEObject object) throws SerializerException, IOException {
 		EClass eClass = object.eClass();
 		if (eClass.getEAnnotation("hidden") != null) {
+			return;
+		}
+		if (eClass.getEPackage() != getPackageMetaData().getEPackage()) {
 			return;
 		}
 		print(DASH);

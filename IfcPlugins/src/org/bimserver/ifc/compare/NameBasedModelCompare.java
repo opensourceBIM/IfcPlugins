@@ -27,13 +27,12 @@ import org.bimserver.models.store.ObjectAdded;
 import org.bimserver.models.store.ObjectRemoved;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.modelcompare.ModelCompareException;
-import org.bimserver.plugins.objectidms.ObjectIDM;
 import org.eclipse.emf.ecore.EClass;
 
 public class NameBasedModelCompare extends AbstractModelCompare {
 
-	public NameBasedModelCompare(ObjectIDM objectIDM) {
-		super(objectIDM);
+	public NameBasedModelCompare() {
+		super();
 	}
 
 	public CompareResult compare(IfcModelInterface model1, IfcModelInterface model2, CompareType compareType)

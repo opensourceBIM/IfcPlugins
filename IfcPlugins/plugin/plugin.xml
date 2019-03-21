@@ -25,6 +25,12 @@
 		<name>Json</name>
 	</JavaPlugin>
 	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.deserializers.StreamingDeserializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.deserializers.JsonStreamingDeserializerPlugin</implementationClass>
+		<description>JsonStreamingDeserializerPlugin</description>
+		<name>Json</name>
+	</JavaPlugin>
+	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifc.step.serializer.Ifc2x3tc1StepSerializerPlugin</implementationClass>
 		<description>Ifc2x3tc1 Serializer</description>

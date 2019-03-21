@@ -1,5 +1,7 @@
 package org.bimserver.deserializers;
 
+import java.util.HashSet;
+
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
  * 
@@ -55,6 +57,9 @@ public class JsonDeserializerPlugin implements DeserializerPlugin {
 
 	@Override
 	public Set<Schema> getSupportedSchemas() {
-		return Schema.IFC2X3TC1.toSet();
+		Set<Schema> set = new HashSet<>();
+		set.add(Schema.IFC2X3TC1);
+		set.add(Schema.IFC4);
+		return set;
 	}
 }

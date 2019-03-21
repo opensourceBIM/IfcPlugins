@@ -35,7 +35,6 @@ import org.bimserver.models.store.ReferenceDataValue;
 import org.bimserver.models.store.SimpleDataValue;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.modelcompare.ModelCompare;
-import org.bimserver.plugins.objectidms.ObjectIDM;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -45,11 +44,9 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 
 public abstract class AbstractModelCompare implements ModelCompare {
-	private final ObjectIDM objectIDM;
 	private final Map<EClass, CompareContainer> map = new HashMap<EClass, CompareContainer>();
 
-	public AbstractModelCompare(ObjectIDM objectIDM) {
-		this.objectIDM = objectIDM;
+	public AbstractModelCompare() {
 	}
 
 	protected DataObject makeDataObject(IdEObject eObject) {
@@ -134,7 +131,7 @@ public abstract class AbstractModelCompare implements ModelCompare {
 		EClass eClass = eObject1.eClass();
 		if (sCompareType == CompareType.ALL || sCompareType == CompareType.MODIFY) {
 			for (EStructuralFeature eStructuralFeature : eClass.getEAllStructuralFeatures()) {
-				if (objectIDM.shouldFollowReference(originalQueryClass, eClass, eStructuralFeature)) {
+				if (true) {
 					if (eStructuralFeature.getEAnnotation("hidden") != null) {
 						continue;
 					}
