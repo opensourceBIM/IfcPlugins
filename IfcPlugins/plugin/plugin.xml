@@ -13,6 +13,12 @@
 		<name>Json (Streaming)</name>
 	</JavaPlugin>
 	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.serializers.MinimalJsonStreamingSerializerPlugin</implementationClass>
+		<description>MinimalJsonStreamingSerializer</description>
+		<name>Minimal Json (Streaming)</name>
+	</JavaPlugin>
+	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.serializers.JsonSerializerPluginWithGeometry</implementationClass>
 		<description>JsonSerializerWithGeometry</description>
