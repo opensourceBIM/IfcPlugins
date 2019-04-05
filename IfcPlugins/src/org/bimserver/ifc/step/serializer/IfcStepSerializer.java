@@ -28,6 +28,7 @@ import org.bimserver.emf.IdEObject;
 import org.bimserver.ifc.IfcSerializer;
 import org.bimserver.ifc.step.deserializer.IfcParserWriterUtils;
 import org.bimserver.models.store.IfcHeader;
+import org.bimserver.plugins.HeaderTakingSerializer;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.serializers.ProgressReporter;
 import org.bimserver.plugins.serializers.SerializerException;
@@ -47,7 +48,7 @@ import com.google.common.base.Charsets;
 
 import nl.tue.buildingsmart.schema.EntityDefinition;
 
-public class IfcStepSerializer extends IfcSerializer {
+public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSerializer {
 	private static final byte[] NEW_LINE = "\n".getBytes(Charsets.UTF_8);
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(IfcStepSerializer.class);
 	private static final EcorePackage ECORE_PACKAGE_INSTANCE = EcorePackage.eINSTANCE;
