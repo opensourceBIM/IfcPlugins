@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opensourcebim</groupId>
   <artifactId>ifcplugins</artifactId>
-  <version>0.0.58-SNAPSHOT</version>
+  <version>0.0.59-SNAPSHOT</version>
   <name>IfcPlugins</name>
   <description>BIMserver plugin that provides IFC serializers/deserializers</description>
   <url>https://github.com/opensourceBIM/IfcPlugins/BIMserver</url>
