@@ -27,7 +27,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -78,6 +77,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
+import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import nl.tue.buildingsmart.schema.Attribute;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
@@ -140,7 +140,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	@Override
 	public long read(InputStream in, String filename, long fileSize, QueryContext reusable) throws DeserializeException {
 		this.reusable = reusable;
-		mappedObjects = new HashMap<>();
+		mappedObjects = new Int2LongArrayMap();
 		waitingList = new WaitingListVirtualObject();
 		mode = Mode.HEADER;
 		if (filename != null && (filename.toUpperCase().endsWith(".ZIP") || filename.toUpperCase().endsWith(".IFCZIP"))) {
