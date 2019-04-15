@@ -42,4 +42,14 @@ public class NopRenderEngine implements RenderEngine {
 	@Override
 	public void close() throws RenderEngineException {
 	}
+
+	@Override
+	public boolean isCalculateQuantities() {
+		return false;
+	}
+
+	@Override
+	public boolean isApplyLayerSets() {
+		return false;
+	}
 }
