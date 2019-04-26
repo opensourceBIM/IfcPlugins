@@ -93,7 +93,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private Schema schema;
 	
 	// ExpressID -> ObjectID
-	// TODO find more efficient implementation
 	private Map<Integer, Long> mappedObjects;
 	private QueryContext reusable;
 	private IfcHeader ifcHeader;
