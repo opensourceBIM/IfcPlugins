@@ -55,7 +55,7 @@
     <dependency>
       <groupId>org.opensourcebim</groupId>
       <artifactId>shared</artifactId>
-      <version>1.5.138-SNAPSHOT</version>
+      <version>1.5.138</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -64,10 +64,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    <groupId>it.unimi.dsi</groupId>
-    <artifactId>fastutil</artifactId>
-    <version>8.2.2</version>
-</dependency>
+      <groupId>it.unimi.dsi</groupId>
+      <artifactId>fastutil</artifactId>
+      <version>8.2.2</version>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
