@@ -19,6 +19,7 @@ package org.bimserver.noprenderengine;
 
 import java.io.InputStream;
 
+import org.bimserver.plugins.renderengine.Metrics;
 import org.bimserver.plugins.renderengine.RenderEngine;
 import org.bimserver.plugins.renderengine.RenderEngineException;
 import org.bimserver.plugins.renderengine.RenderEngineModel;
@@ -51,5 +52,10 @@ public class NopRenderEngine implements RenderEngine {
 	@Override
 	public boolean isApplyLayerSets() {
 		return false;
+	}
+
+	@Override
+	public Metrics getMetrics() {
+		return null;
 	}
 }
