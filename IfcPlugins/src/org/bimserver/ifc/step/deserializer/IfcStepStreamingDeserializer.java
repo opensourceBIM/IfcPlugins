@@ -453,7 +453,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private boolean readList(String val, ListCapableVirtualObject object, EStructuralFeature structuralFeature, VirtualObject parentObject, int parentIndex) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		int index = 0;
 		if (!structuralFeature.isMany()) {
-			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + parentObject.eClass().getName() + " is no aggregation");
+			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + (parentObject == null ? structuralFeature.getEContainingClass().getName() : parentObject.eClass().getName()) + " is no aggregation");
 		}
 		boolean isDouble = structuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble();
 		EStructuralFeature doubleStringFeature = null;
