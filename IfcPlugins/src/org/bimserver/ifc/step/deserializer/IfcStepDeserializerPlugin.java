@@ -68,13 +68,15 @@ public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin, I
 	}
 
 	@Override
-	public Schema determineSchema(byte[] head, boolean usesZip) {
+	public Schema determineSchema(byte[] head, boolean usesZip) throws DeserializeException {
 		DetectIfcVersion detectIfcVersion = new DetectIfcVersion();
 		try {
-			String schema = detectIfcVersion.detectVersion(head, usesZip);
-			return Schema.fromIfcHeader(schema);
-		} catch (DeserializeException e) {
-			e.printStackTrace();
+			String schemaString = detectIfcVersion.detectVersion(head, usesZip);
+			Schema schema = Schema.fromIfcHeader(schemaString);
+			if (schema == null) {
+				throw new DeserializeException("Unsupported IFC schema: " + schemaString);
+			}
+			return schema;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
