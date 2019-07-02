@@ -1,5 +1,9 @@
 package org.bimserver.ifc.step.deserializer;
 
+import java.io.IOException;
+
+import org.bimserver.emf.Schema;
+
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
  * 
@@ -20,10 +24,12 @@ package org.bimserver.ifc.step.deserializer;
 import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
+import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.IfcSchemaDeterminer;
 import org.bimserver.plugins.deserializers.StreamingDeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
-public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDeserializerPlugin {
+public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDeserializerPlugin, IfcSchemaDeterminer {
 
 	@Override
 	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
@@ -41,6 +47,22 @@ public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDes
 	
 	@Override
 	public ObjectDefinition getSystemSettingsDefinition() {
+		return null;
+	}
+	
+	@Override
+	public Schema determineSchema(byte[] head, boolean usesZip) throws DeserializeException {
+		DetectIfcVersion detectIfcVersion = new DetectIfcVersion();
+		try {
+			String schemaString = detectIfcVersion.detectVersion(head, usesZip);
+			Schema schema = Schema.fromIfcHeader(schemaString);
+			if (schema == null) {
+				throw new DeserializeException("Unsupported IFC schema: " + schemaString);
+			}
+			return schema;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }
