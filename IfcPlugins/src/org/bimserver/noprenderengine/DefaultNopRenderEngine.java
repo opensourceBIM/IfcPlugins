@@ -1,5 +1,7 @@
 package org.bimserver.noprenderengine;
 
+import java.util.GregorianCalendar;
+
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
  * 
@@ -50,6 +52,7 @@ public class DefaultNopRenderEngine implements RenderEnginePlugin {
 
 	@Override
 	public VersionInfo getVersionInfo() {
-		return null;
+		VersionInfo versionInfo = new VersionInfo("nop", "nop", "nop", new GregorianCalendar(), "nop");
+		return versionInfo;
 	}
 }
