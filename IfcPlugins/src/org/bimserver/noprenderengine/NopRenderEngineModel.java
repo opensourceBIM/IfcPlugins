@@ -37,7 +37,7 @@ public class NopRenderEngineModel implements RenderEngineModel {
 	}
 
 	@Override
-	public RenderEngineInstance getInstanceFromExpressId(int oid) throws RenderEngineException {
+	public RenderEngineInstance getInstanceFromExpressId(long oid) throws RenderEngineException {
 		return new NopRenderEngineInstance();
 	}
 

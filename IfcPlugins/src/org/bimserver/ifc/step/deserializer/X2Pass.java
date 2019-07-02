@@ -29,7 +29,7 @@ import com.google.common.base.Charsets;
 public class X2Pass extends Pass {
 
 	@Override
-	public String process(int lineNumber, String result) throws DeserializeException {
+	public String process(long lineNumber, String result) throws DeserializeException {
 		while (result.contains("\\X2\\")) {
 			int index = result.indexOf("\\X2\\");
 			int indexOfEnd = result.indexOf("\\X0\\", index);

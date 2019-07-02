@@ -23,7 +23,7 @@ import java.nio.CharBuffer;
 import com.google.common.base.Charsets;
 
 public class SPass extends Pass {
-	public String process(int lineNumber, String result) {
+	public String process(long lineNumber, String result) {
 		while (result.contains("\\S\\")) {
 			int index = result.indexOf("\\S\\");
 			char x = result.charAt(index + 3);

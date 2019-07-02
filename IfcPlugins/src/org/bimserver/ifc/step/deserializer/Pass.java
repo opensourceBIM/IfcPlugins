@@ -21,5 +21,5 @@ import org.bimserver.plugins.deserializers.DeserializeException;
 
 public abstract class Pass {
 
-	public abstract String process(int lineNumber, String result) throws DeserializeException;
+	public abstract String process(long lineNumber, String result) throws DeserializeException;
 }

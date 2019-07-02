@@ -35,7 +35,7 @@ public class ParserPlan {
 		passes.add(pass);
 	}
 	
-	public String process(int lineNumber, String input) throws DeserializeException {
+	public String process(long lineNumber, String input) throws DeserializeException {
 		for (Pass pass : passes) {
 			input = pass.process(lineNumber, input);
 		}

@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 
-import it.unimi.dsi.fastutil.ints.Int2LongOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import nl.tue.buildingsmart.schema.Attribute;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
@@ -89,11 +89,11 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private static final String WRAPPED_VALUE = "wrappedValue";
 	private WaitingListVirtualObject waitingList;
 	private Mode mode = Mode.HEADER;
-	private int lineNumber;
+	private long lineNumber;
 	private Schema schema;
 	
 	// ExpressID -> ObjectID
-	private Map<Integer, Long> mappedObjects;
+	private Map<Long, Long> mappedObjects;
 	private QueryContext reusable;
 	private IfcHeader ifcHeader;
 	
@@ -139,7 +139,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	@Override
 	public long read(InputStream in, String filename, long fileSize, QueryContext reusable) throws DeserializeException {
 		this.reusable = reusable;
-		mappedObjects = new Int2LongOpenHashMap();
+		mappedObjects = new Long2LongOpenHashMap();
 		waitingList = new WaitingListVirtualObject();
 		mode = Mode.HEADER;
 		if (filename != null && (filename.toUpperCase().endsWith(".ZIP") || filename.toUpperCase().endsWith(".IFCZIP"))) {
@@ -328,7 +328,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (indexOfLastParen == -1) {
 			throw new DeserializeException(lineNumber, "No right parenthesis found in line");
 		}
-		int recordNumber = Integer.parseInt(line.substring(1, equalSignLocation).trim());
+		long recordNumber = Long.parseLong(line.substring(1, equalSignLocation).trim());
 		String name = line.substring(equalSignLocation + 1, indexOfFirstParen).trim();
 		EClass eClass = (EClass) getPackageMetaData().getEClassifierCaseInsensitive(name);
 
@@ -475,7 +475,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			lastIndex = nextIndex;
 			if (stringValue.length() > 0) {
 				if (stringValue.charAt(0) == '#') {
-					Integer referenceId = Integer.parseInt(stringValue.substring(1));
+					Long referenceId = Long.parseLong(stringValue.substring(1));
 					if (mappedObjects.containsKey(referenceId)) {
 						Long referencedOid = mappedObjects.get(referenceId);
 						if (referencedOid != null) {
@@ -693,7 +693,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			return true;
 		}
 		try {
-			int referenceId = Integer.parseInt(val.substring(1));
+			long referenceId = Long.parseLong(val.substring(1));
 			if (mappedObjects.containsKey(referenceId)) {
 				object.setReference(structuralFeature, mappedObjects.get(referenceId), -1);
 				return true;

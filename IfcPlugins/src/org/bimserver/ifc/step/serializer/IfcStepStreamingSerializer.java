@@ -55,7 +55,7 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 
-import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.SchemaDefinition;
 
@@ -79,8 +79,8 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 	private String headerSchema;
 	private ObjectProvider objectProvider;
 	
-	private Long2IntOpenHashMap oidToEid = new Long2IntOpenHashMap();
-	private int oidCounter = 1;
+	private final Map<Long, Long> oidToEid = new Long2LongOpenHashMap();
+	private long oidCounter = 1;
 
 	protected static enum Mode {
 		HEADER, BODY, FOOTER, FINISHED
@@ -105,7 +105,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		return result;
 	}
 	
-	public Map<Long, Integer> getOidToEid() {
+	public Map<Long, Long> getOidToEid() {
 		return oidToEid;
 	}
 	
@@ -216,7 +216,7 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 			return;
 		}
 		print(DASH);
-		int convertedKey = getExpressId(object);
+		long convertedKey = getExpressId(object);
 		if (convertedKey == -1) {
 			throw new SerializerException("Going to serialize an object with id -1 (" + object.eClass().getName() + ")");
 		}
@@ -261,15 +261,15 @@ public abstract class IfcStepStreamingSerializer implements StreamingSerializer,
 		println(PAREN_CLOSE_SEMICOLON);
 	}
 
-	private int getExpressId(HashMapVirtualObject object) {
+	private long getExpressId(HashMapVirtualObject object) {
 		return getExpressId(object.getOid());
 	}
 
-	private int getExpressId(long oid) {
+	private long getExpressId(long oid) {
 		if (oidToEid.containsKey(oid)) {
 			return oidToEid.get(oid);
 		} else {
-			int eid = oidCounter++;
+			long eid = oidCounter++;
 			oidToEid.put(oid, eid);
 			return eid;
 		}

@@ -50,7 +50,7 @@ public class IfcParserWriterUtils {
 		new ParserPlan(new SPass(), new XPass(), new X2Pass(), new X4Pass())
 	};
 
-	public static Object convertSimpleValue(PackageMetaData packageMetaData, EStructuralFeature eStructuralFeature, Class<?> instanceClass, String value, int lineNumber) throws DeserializeException {
+	public static Object convertSimpleValue(PackageMetaData packageMetaData, EStructuralFeature eStructuralFeature, Class<?> instanceClass, String value, long lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
 			if (instanceClass == Integer.class || instanceClass == int.class) {
 				try {
@@ -136,7 +136,7 @@ public class IfcParserWriterUtils {
 	 * @return The decoded string
 	 * @throws DeserializeException
 	 */
-	public static String readString(String value, int lineNumber) throws DeserializeException {
+	public static String readString(String value, long lineNumber) throws DeserializeException {
 		String result = value.substring(1, value.length() - 1);
 		// Replace all '' with '
 		while (result.contains("''")) {

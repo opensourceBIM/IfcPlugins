@@ -27,7 +27,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.bimserver.plugins.deserializers.DeserializeException;
 
 public class X4Pass extends Pass {
-	public String process(int lineNumber, String result) throws DeserializeException {
+	public String process(long lineNumber, String result) throws DeserializeException {
 		while (result.contains("\\X4\\")) {
 			int index = result.indexOf("\\X4\\");
 			int indexOfEnd = result.indexOf("\\X0\\", index);
