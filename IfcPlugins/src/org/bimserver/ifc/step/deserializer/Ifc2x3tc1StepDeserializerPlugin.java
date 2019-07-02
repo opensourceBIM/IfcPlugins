@@ -24,6 +24,11 @@ import org.bimserver.emf.Schema;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.deserializers.Deserializer;
 
+/**
+ * @author Ruben de Laat
+ *	Replaced by the streaming deserializers
+ */
+@Deprecated
 public class Ifc2x3tc1StepDeserializerPlugin extends IfcStepDeserializerPlugin {
 	@Override
 	public Deserializer createDeserializer(PluginConfiguration pluginConfiguration) {

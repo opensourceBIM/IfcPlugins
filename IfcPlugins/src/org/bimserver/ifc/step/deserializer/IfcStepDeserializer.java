@@ -67,6 +67,11 @@ import nl.tue.buildingsmart.schema.Attribute;
 import nl.tue.buildingsmart.schema.EntityDefinition;
 import nl.tue.buildingsmart.schema.ExplicitAttribute;
 
+/**
+ * @author Ruben de Laat
+ *	Replaced by the streaming deserializers
+ */
+@Deprecated
 public abstract class IfcStepDeserializer extends EmfDeserializer {
 	/*
 	 * The following hacks are present
@@ -79,10 +84,10 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 
 	private static final int AVERAGE_LINE_LENGTH = 58;
 	private static final String WRAPPED_VALUE = "wrappedValue";
-	private final WaitingList<Integer> waitingList = new WaitingList<Integer>();
+	private final WaitingList<Long> waitingList = new WaitingList<>();
 	private Mode mode = Mode.HEADER;
 	private IfcModelInterface model;
-	private int lineNumber;
+	private long lineNumber;
 	private Schema schema;
 
 	public enum Mode {
@@ -285,7 +290,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		if (indexOfLastParen == -1) {
 			throw new DeserializeException(lineNumber, "No right parenthesis found in line");
 		}
-		int recordNumber = Integer.parseInt(line.substring(1, equalSignLocation).trim());
+		long recordNumber = Long.parseLong(line.substring(1, equalSignLocation).trim());
 		String name = line.substring(equalSignLocation + 1, indexOfFirstParen).trim();
 		EClass eClass = (EClass) getPackageMetaData().getEClassifierCaseInsensitive(name);
 		if (eClass != null) {
@@ -400,7 +405,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			lastIndex = nextIndex;
 			if (stringValue.length() > 0) {
 				if (stringValue.charAt(0) == '#') {
-					Integer referenceId = Integer.parseInt(stringValue.substring(1));
+					long referenceId = Long.parseLong(stringValue.substring(1));
 					if (model.contains(referenceId)) {
 						EObject referencedObject = model.get(referenceId);
 						if (referencedObject != null) {
@@ -593,9 +598,9 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			return;
 		}
 
-		int referenceId;
+		long referenceId;
 		try {
-			referenceId = Integer.parseInt(val.substring(1));
+			referenceId = Long.parseLong(val.substring(1));
 		} catch (NumberFormatException e) {
 			throw new DeserializeException(lineNumber, "'" + val + "' is not a valid reference");
 		}

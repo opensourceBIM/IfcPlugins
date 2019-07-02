@@ -85,18 +85,6 @@
 		<name>IfcXml 2x3tc1</name>
 	</JavaPlugin>
 	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.deserializers.DeserializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc4StepDeserializerPlugin</implementationClass>
-		<description>Ifc4 Step Deserializer</description>
-		<name>Ifc4</name>
-	</JavaPlugin>
-	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.deserializers.DeserializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc2x3tc1StepDeserializerPlugin</implementationClass>
-		<description>Ifc2x3tc1 Step Deserializer</description>
-		<name>Ifc2x3tc1</name>
-	</JavaPlugin>
-	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.deserializers.StreamingDeserializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc4StepStreamingDeserializerPlugin</implementationClass>
 		<description>Ifc4 Step Streaming Deserializer</description>

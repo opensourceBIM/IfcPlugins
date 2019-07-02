@@ -19,6 +19,11 @@ package org.bimserver.ifc.step.deserializer;
 
 import org.bimserver.emf.Schema;
 
+/**
+ * @author Ruben de Laat
+ *	Replaced by the streaming deserializers
+ */
+@Deprecated
 public class Ifc4StepDeserializer extends IfcStepDeserializer {
 
 	public Ifc4StepDeserializer(Schema schema) {

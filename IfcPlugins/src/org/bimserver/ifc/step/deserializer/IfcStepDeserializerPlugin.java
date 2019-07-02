@@ -46,6 +46,11 @@ import org.bimserver.plugins.deserializers.DeserializerPlugin;
 import org.bimserver.plugins.deserializers.IfcSchemaDeterminer;
 import org.bimserver.shared.exceptions.PluginException;
 
+/**
+ * @author Ruben de Laat
+ *	Replaced by the streaming deserializers
+ */
+@Deprecated
 public abstract class IfcStepDeserializerPlugin implements DeserializerPlugin, IfcSchemaDeterminer {
 
 	@Override
