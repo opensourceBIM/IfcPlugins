@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -98,6 +99,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private IfcHeader ifcHeader;
 	
 	private static MetricCollector metricCollector = new MetricCollector();
+	
+	// This is enabled for now so we can test more models, not decided yet whether this will be enabled in the final release
+	private static final boolean CONVERT_INVALID_IFC_GUIDS = true;
 	
 	// Use String instead of EClass, compare takes 1.7%
 	private final Map<String, AtomicInteger> summaryMap = new TreeMap<>();
@@ -400,13 +404,10 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						} else {
 							if (!eStructuralFeature.isMany()) {
 								Object converted = convert(eStructuralFeature, eStructuralFeature.getEType(), val);
-								object.setAttribute(eStructuralFeature, converted);
 								if (eStructuralFeature.getName().equals("GlobalId")) {
-									try {
-										GuidCompressor.getGuidFromCompressedString(converted.toString(), new Guid());
-									} catch (InvalidGuidException e) {
-										throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
-									}
+									processGuid(object, eStructuralFeature, converted);
+								} else {
+									object.setAttribute(eStructuralFeature, converted);
 								}
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
@@ -442,6 +443,31 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			if (!openReferences) {
 				int nrBytes = getDatabaseInterface().save(object);
 				metricCollector.collect(line.length(), nrBytes);
+			}
+		}
+	}
+
+	private void processGuid(VirtualObject object, EStructuralFeature eStructuralFeature, Object converted) throws BimserverDatabaseException, DeserializeException {
+		try {
+			GuidCompressor.getGuidFromCompressedString(converted.toString(), new Guid());
+			object.setAttribute(eStructuralFeature, converted);
+			// If it's valid, we do nothing, we just store it as it was
+		} catch (InvalidGuidException e) {
+			if (CONVERT_INVALID_IFC_GUIDS) {
+				// The GUID is invalid according to the IFC spec, sometimes another representation is used in IFC files, which is a valid GUID, but not according to the IFC spec
+				// The next bit of code tries this variant, it remains to be decided what will be the final implementation for this in deserializer
+				try {
+					UUID uuid = UUID.fromString(converted.toString());
+					String ifcGuid = GuidCompressor.compressGuidString(uuid.toString());
+					LOGGER.warn("Invalid GUID on line " + lineNumber + " , converted from default UUID format (" + uuid.toString() + ") to IFC format (" + ifcGuid + ")");
+					// If this succeeds, we convert the UUID to the IFC format, and store that, so this "changes" the model
+					object.setAttribute(eStructuralFeature, ifcGuid);
+				} catch (Exception e2) {
+					// We use the original exception's message, since that is most accurate
+					throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
+				}
+			} else {
+				throw new DeserializeException("Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
 			}
 		}
 	}
