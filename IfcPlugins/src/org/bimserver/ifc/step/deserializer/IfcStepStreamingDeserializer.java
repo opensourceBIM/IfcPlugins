@@ -37,6 +37,7 @@ import java.util.zip.ZipInputStream;
 
 import org.bimserver.BimserverDatabaseException;
 import org.bimserver.database.MetricCollector;
+import org.bimserver.emf.IdEObjectImpl;
 import org.bimserver.emf.MetaDataException;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.emf.Schema;
@@ -282,6 +283,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			if (ifcHeader == null) {
 				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
 			}
+			((IdEObjectImpl)ifcHeader).setUuid(UUID.randomUUID());
 			if (line.startsWith("/*")) {
 				if (line.contains("*/")) {
 					line = line.substring(line.indexOf("*/") + 2);
