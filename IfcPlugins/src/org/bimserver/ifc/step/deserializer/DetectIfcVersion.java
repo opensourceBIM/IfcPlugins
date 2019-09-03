@@ -35,6 +35,7 @@ import org.bimserver.emf.MetaDataException;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.utils.FakeClosingInputStream;
 
 import com.google.common.base.Charsets;
@@ -61,7 +62,7 @@ public class DetectIfcVersion {
 			ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(head));
 			ZipEntry nextEntry = zipInputStream.getNextEntry();
 			if (nextEntry == null) {
-				throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file looks empty");
+				throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_NO_IFC_FILES, "Zip files must contain exactly one IFC-file, this zip-file looks empty");
 			}
 			if (nextEntry.getName().toUpperCase().endsWith(".IFC")) {
 				FakeClosingInputStream fakeClosingInputStream = new FakeClosingInputStream(zipInputStream);
@@ -71,7 +72,7 @@ public class DetectIfcVersion {
 			read(new ByteArrayInputStream(head));
 		}
 		if (ifcHeader.getIfcSchemaVersion() == null) {
-			throw new DeserializeException("No IFC schema found");
+			throw new DeserializeException(DeserializerErrorCode.NO_IFC_SCHEMA_VERSION_FOUND, "No IFC schema found");
 		}
 		return ifcHeader.getIfcSchemaVersion();
 	}
@@ -82,7 +83,7 @@ public class DetectIfcVersion {
 		try {
 			String line = reader.readLine();
 			if (line == null) {
-				throw new DeserializeException(0, "Unexpected end of stream reading first line");
+				throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_END_OF_STREAM_WHILE_READING_FIRST_LINE, 0, "Unexpected end of stream reading first line");
 			}
 			while (line != null) {
 				try {
@@ -98,7 +99,7 @@ public class DetectIfcVersion {
 					if (e instanceof DeserializeException) {
 						throw (DeserializeException)e;
 					} else {
-						throw new DeserializeException(lineNumber, " (" + e.getMessage() + ") " + line, e);
+						throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, " (" + e.getMessage() + ") " + line, e);
 					}
 				}
 

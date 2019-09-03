@@ -17,6 +17,7 @@ package org.bimserver.ifc.xml.deserializer;
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
 
+@Deprecated
 public class Ifc4XmlDeserializer extends IfcXmlDeserializer {
 
 }

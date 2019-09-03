@@ -43,6 +43,7 @@ import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.plugins.deserializers.EmfDeserializer;
 import org.bimserver.shared.ListWaitingObject;
 import org.bimserver.shared.SingleWaitingObject;
@@ -106,24 +107,24 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			try {
 				nextEntry = zipInputStream.getNextEntry();
 				if (nextEntry == null) {
-					throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file looks empty");
+					throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_NO_IFC_FILES, "Zip files must contain exactly one IFC-file, this zip-file looks empty");
 				}
 				if (nextEntry.getName().toUpperCase().endsWith(".IFC")) {
 					IfcModelInterface model = null;
 					FakeClosingInputStream fakeClosingInputStream = new FakeClosingInputStream(zipInputStream);
 					model = read(fakeClosingInputStream, fileSize, byteProgressReporter);
 					if (model.size() == 0) {
-						throw new DeserializeException("Uploaded file does not seem to be a correct IFC file");
+						throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_EMPTY_IFC_MODEL, "Uploaded file does not seem to be a correct IFC file");
 					}
 					if (zipInputStream.getNextEntry() != null) {
 						zipInputStream.close();
-						throw new DeserializeException("Zip files may only contain one IFC-file, this zip-file contains more files");
+						throw new DeserializeException(DeserializerErrorCode.IFCZIP_FILE_CONTAINS_TOO_MANY_FILES, "Zip files may only contain one IFC-file, this zip-file contains more files");
 					} else {
 						zipInputStream.close();
 						return model;
 					}
 				} else {
-					throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
+					throw new DeserializeException(DeserializerErrorCode.IFCZIP_MUST_CONTAIN_EXACTLY_ONE_IFC_FILE, "Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
 				}
 			} catch (IOException e) {
 				throw new DeserializeException(e);
@@ -142,7 +143,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		try {
 			String line = reader.readLine();
 			if (line == null) {
-				throw new DeserializeException("Unexpected end of stream reading first line " + model);
+				throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_END_OF_STREAM_WHILE_READING_FIRST_LINE, "Unexpected end of stream reading first line " + model);
 			}
 			MessageDigest md = MessageDigest.getInstance("MD5");
 			while (line != null) {
@@ -161,7 +162,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					if (e instanceof DeserializeException) {
 						throw (DeserializeException)e;
 					} else {
-						throw new DeserializeException(lineNumber, " (" + e.getMessage() + ") " + line, e);
+						throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, " (" + e.getMessage() + ") " + line, e);
 					}
 				}
 				bytesRead += bytes.length;
@@ -174,7 +175,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			}
 			model.getModelMetaData().setChecksum(md.digest());
 			if (mode == Mode.HEADER) {
-				throw new DeserializeException(lineNumber, "No valid IFC header found");
+				throw new DeserializeException(DeserializerErrorCode.NO_VALID_IFC_HEADER_FOUND, lineNumber, "No valid IFC header found");
 			}
 		} catch (FileNotFoundException e) {
 			throw new DeserializeException(lineNumber, e);
@@ -265,7 +266,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 
 				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
 				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
-					throw new DeserializeException(lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
+					throw new DeserializeException(DeserializerErrorCode.UNSUPPORTED_IFC_SCHEMA_VERSION, lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
 				}
 				ifcHeader.setIfcSchemaVersion(ifcSchemaVersion);
 			} else if (line.startsWith("ENDSEC;")) {
@@ -280,15 +281,15 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		int equalSignLocation = line.indexOf("=");
 		int lastIndexOfSemiColon = line.lastIndexOf(";");
 		if (lastIndexOfSemiColon == -1) {
-			throw new DeserializeException(lineNumber, "No semicolon found in line");
+			throw new DeserializeException(DeserializerErrorCode.NO_SEMICOLON_FOUND_IN_RECORD, lineNumber, "No semicolon found in line");
 		}
 		int indexOfFirstParen = line.indexOf("(", equalSignLocation);
 		if (indexOfFirstParen == -1) {
-			throw new DeserializeException(lineNumber, "No left parenthesis found in line");
+			throw new DeserializeException(DeserializerErrorCode.NO_LEFT_PARENTHESIS_FOUND_IN_RECORD, lineNumber, "No left parenthesis found in line");
 		}
 		int indexOfLastParen = line.lastIndexOf(")", lastIndexOfSemiColon);
 		if (indexOfLastParen == -1) {
-			throw new DeserializeException(lineNumber, "No right parenthesis found in line");
+			throw new DeserializeException(DeserializerErrorCode.NO_RIGHT_PARENTHESIS_FOUND_IN_RECORD, lineNumber, "No right parenthesis found in line");
 		}
 		long recordNumber = Long.parseLong(line.substring(1, equalSignLocation).trim());
 		String name = line.substring(equalSignLocation + 1, indexOfFirstParen).trim();
@@ -305,7 +306,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			int lastIndex = 0;
 			EntityDefinition entityBN = getPackageMetaData().getSchemaDefinition().getEntityBN(name);
 			if (entityBN == null) {
-				throw new DeserializeException(lineNumber, "Unknown entity " + name);
+				throw new DeserializeException(DeserializerErrorCode.UNKNOWN_ENTITY, lineNumber, "Unknown entity " + name);
 			}
 			for (EStructuralFeature eStructuralFeature : eClass.getEAllStructuralFeatures()) {
 				if (getPackageMetaData().useForSerialization(eClass, eStructuralFeature)) {
@@ -329,7 +330,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 									expected++;
 								}
 							}
-							throw new DeserializeException(lineNumber, eClass.getName() + " expects " + expected + " fields, but less found");
+							throw new DeserializeException(DeserializerErrorCode.NOT_ENOUGH_FIELDS_FOR_ENTITY, lineNumber, eClass.getName() + " expects " + expected + " fields, but less found");
 						}
 						lastIndex = nextIndex;
 						char firstChar = val.charAt(0);
@@ -378,7 +379,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				waitingList.updateNode(recordNumber, eClass, object);
 			}
 		} else {
-			throw new DeserializeException(lineNumber, name + " is not a known entity");
+			throw new DeserializeException(DeserializerErrorCode.UNKNOWN_ENTITY, lineNumber, name + " is not a known entity");
 		}
 	}
 
@@ -386,14 +387,14 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 	private void readList(String val, EObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException {
 		int index = 0;
 		if (!structuralFeature.isMany()) {
-			throw new DeserializeException(lineNumber, "Field " + structuralFeature.getName() + " of " + structuralFeature.getEContainingClass().getName() + " is no aggregation");
+			throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + structuralFeature.getName() + " of " + structuralFeature.getEContainingClass().getName() + " is no aggregation");
 		}
 		AbstractEList list = (AbstractEList) object.eGet(structuralFeature);
 		AbstractEList doubleStringList = null;
 		if (structuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 			EStructuralFeature doubleStringFeature = structuralFeature.getEContainingClass().getEStructuralFeature(structuralFeature.getName() + "AsString");
 			if (doubleStringFeature == null) {
-				throw new DeserializeException(lineNumber, "Field not found: " + structuralFeature.getName() + "AsString");
+				throw new DeserializeException(DeserializerErrorCode.INTERNAL_BIMSERVER_ERROR, lineNumber, "Field not found: " + structuralFeature.getName() + "AsString");
 			}
 			doubleStringList = (AbstractEList) object.eGet(doubleStringFeature);
 		}
@@ -416,7 +417,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 								}
 								list.setUnique(index, referencedObject);
 							} else {
-								throw new DeserializeException(lineNumber, referenceEClass.getName() + " cannot be stored in " + structuralFeature.getName());
+								throw new DeserializeException(DeserializerErrorCode.REFERENCED_OBJECT_CANNOT_BE_STORED_IN_THIS_FIELD, lineNumber, referenceEClass.getName() + " cannot be stored in " + structuralFeature.getName());
 							}
 						}
 					} else {
@@ -460,13 +461,13 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							try {
 								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Integer.parseInt(value));
 							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid integer(32) value");
+								throw new DeserializeException(DeserializerErrorCode.INVALID_INTEGER_LITERAL, lineNumber, value + " is not a valid integer(32) value");
 							}
 						} else if (instanceClass == Long.class || instanceClass == long.class) {
 							try {
 								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Long.parseLong(value));
 							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid integer(64) value");
+								throw new DeserializeException(DeserializerErrorCode.INVALID_LONG_LITERAL, lineNumber, value + " is not a valid integer(64) value");
 							}
 						} else if (instanceClass == Boolean.class || instanceClass == boolean.class) {
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), value.equals(".T."));
@@ -474,7 +475,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							try {
 								newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), Double.parseDouble(value));
 							} catch (NumberFormatException e) {
-								throw new DeserializeException(lineNumber, value + " is not a valid floating point(32) number");
+								throw new DeserializeException(DeserializerErrorCode.INVALID_DOUBLE_LITERAL, lineNumber, value + " is not a valid floating point(32) number");
 							}
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
 						} else if (instanceClass == String.class) {
@@ -490,7 +491,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 							}
 							newObject.eSet(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE), tristate);
 						} else {
-							throw new DeserializeException(lineNumber, instanceClass.getSimpleName() + " not implemented");
+							throw new DeserializeException(DeserializerErrorCode.UNIMPLEMENTED_BIMSERVER_FEATURE, lineNumber, instanceClass.getSimpleName() + " not implemented");
 						}
 					}
 					return newObject;
@@ -518,7 +519,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				}
 				return convert;
 			} else {
-				throw new DeserializeException(lineNumber, typeName + " is not an existing IFC entity");
+				throw new DeserializeException(DeserializerErrorCode.NON_EXISTING_ENTITY_TYPE_USED, lineNumber, typeName + " is not an existing IFC entity type");
 			}
 		} else {
 			return IfcParserWriterUtils.convertSimpleValue(getPackageMetaData(), eStructuralFeature, classifier.getInstanceClass(), value, lineNumber);
@@ -581,11 +582,11 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					}
 				}
 				if (enumValue == null) {
-					throw new DeserializeException(lineNumber, "Enum type " + structuralFeature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
+					throw new DeserializeException(DeserializerErrorCode.NON_EXISTING_ENUM_LITERAL_USED, lineNumber, "Enum type " + structuralFeature.getEType().getName() + " has no literal value '" + realEnumValue + "'");
 				}
 				object.eSet(structuralFeature, enumValue.getInstance());
 			} else {
-				throw new DeserializeException(lineNumber, "Value " + val + " indicates enum type but " + structuralFeature.getEType().getName() + " expected");
+				throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_ENUM, lineNumber, "Value " + val + " indicates enum type but " + structuralFeature.getEType().getName() + " expected");
 			}
 		}
 	}
@@ -602,7 +603,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		try {
 			referenceId = Long.parseLong(val.substring(1));
 		} catch (NumberFormatException e) {
-			throw new DeserializeException(lineNumber, "'" + val + "' is not a valid reference");
+			throw new DeserializeException(DeserializerErrorCode.INVALID_REFERENCE, lineNumber, "'" + val + "' is not a valid reference");
 		}
 		if (model.contains(referenceId)) {
 			object.eSet(structuralFeature, model.get(referenceId));

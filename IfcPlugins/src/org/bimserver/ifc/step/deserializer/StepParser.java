@@ -18,6 +18,7 @@ package org.bimserver.ifc.step.deserializer;
  *****************************************************************************/
 
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.utils.StringUtils;
 
 public class StepParser {
@@ -39,7 +40,7 @@ public class StepParser {
 		try {
 			val = line.substring(lastIndex, nextIndex - 1).trim();
 		} catch (Exception e) {
-			throw new DeserializeException(0, "Expected string");
+			throw new DeserializeException(DeserializerErrorCode.EXPECTED_STRING, 0, "Expected string");
 		}
 		lastIndex = StringUtils.nextField(this.line, nextIndex);
 		
@@ -80,7 +81,7 @@ public class StepParser {
 		if (character.equals(")")) {
 			lastIndex++;
 		} else {
-			throw new DeserializeException("Expected ), got " + character);
+			throw new DeserializeException(DeserializerErrorCode.EXPECTED_RIGHT_PARENTHESIS, "Expected ), got " + character);
 		}
 	}
 }

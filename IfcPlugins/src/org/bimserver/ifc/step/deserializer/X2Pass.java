@@ -23,6 +23,7 @@ import java.nio.CharBuffer;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 
 import com.google.common.base.Charsets;
 
@@ -34,10 +35,10 @@ public class X2Pass extends Pass {
 			int index = result.indexOf("\\X2\\");
 			int indexOfEnd = result.indexOf("\\X0\\", index);
 			if (indexOfEnd == -1) {
-				throw new DeserializeException(lineNumber, "\\X2\\ not closed with \\X0\\");
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_X2_NOT_CLOSED_WITH_X0, lineNumber, "\\X2\\ not closed with \\X0\\");
 			}
 			if ((indexOfEnd - index) % 4 != 0) {
-				throw new DeserializeException(lineNumber, "Number of hex chars in \\X2\\ definition not divisible by 4");
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_NUMBER_OF_HEX_CHARS_IN_X2_NOT_DIVISIBLE_BY_4, lineNumber, "Number of hex chars in \\X2\\ definition not divisible by 4");
 			}
 			try {
 				ByteBuffer buffer = ByteBuffer.wrap(Hex.decodeHex(result.substring(index + 4, indexOfEnd).toCharArray()));

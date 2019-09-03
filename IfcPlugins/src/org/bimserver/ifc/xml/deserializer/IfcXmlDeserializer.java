@@ -39,6 +39,7 @@ import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.plugins.deserializers.EmfDeserializer;
 import org.bimserver.utils.FakeClosingInputStream;
 import org.eclipse.emf.ecore.EClass;
@@ -49,6 +50,7 @@ import org.eclipse.emf.ecore.EEnumLiteral;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 
+@Deprecated
 public abstract class IfcXmlDeserializer extends EmfDeserializer {
 
 	private IfcModel model;
@@ -67,24 +69,24 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 			try {
 				nextEntry = zipInputStream.getNextEntry();
 				if (nextEntry == null) {
-					throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file looks empty");
+					throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_NO_IFC_FILES, "Zip files must contain exactly one IFC-file, this zip-file looks empty");
 				}
 				if (nextEntry.getName().toUpperCase().endsWith(".IFCXML")) {
 					IfcModelInterface model = null;
 					FakeClosingInputStream fakeClosingInputStream = new FakeClosingInputStream(zipInputStream);
 					model = read(fakeClosingInputStream);
 					if (model.size() == 0) {
-						throw new DeserializeException("Uploaded file does not seem to be a correct IFC file");
+						throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_EMPTY_IFC_MODEL, "Uploaded file does not seem to be a correct IFC file");
 					}
 					if (zipInputStream.getNextEntry() != null) {
 						zipInputStream.close();
-						throw new DeserializeException("Zip files may only contain one IFC-file, this zip-file contains more files");
+						throw new DeserializeException(DeserializerErrorCode.IFCZIP_FILE_CONTAINS_TOO_MANY_FILES, "Zip files may only contain one IFC-file, this zip-file contains more files");
 					} else {
 						zipInputStream.close();
 						return model;
 					}
 				} else {
-					throw new DeserializeException("Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
+					throw new DeserializeException(DeserializerErrorCode.IFCZIP_MUST_CONTAIN_EXACTLY_ONE_IFC_FILE, "Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
 				}
 			} catch (IOException e) {
 				throw new DeserializeException(e);
@@ -239,14 +241,14 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 		String className = reader.getLocalName();
 		EClassifier eClassifier = model.getPackageMetaData().getEClassifier(className);
 		if (eClassifier == null || !(eClassifier instanceof EClass)) {
-			throw new DeserializeException("No class with name " + className + " was found");
+			throw new DeserializeException(DeserializerErrorCode.UNKNOWN_ENTITY, "No class with name " + className + " was found");
 		}
 		String id = reader.getAttributeValue("", "id");
 		if (id == null) {
-			throw new DeserializeException("No id attribute found on " + className);
+			throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "No id attribute found on " + className);
 		}
 		if (!id.startsWith("i")) {
-			throw new DeserializeException("Id " + id + " is not starting with the letter 'i'");
+			throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "Id " + id + " is not starting with the letter 'i'");
 		}
 		EClass eClass = (EClass) eClassifier;
 		long oid = Long.parseLong(id.substring(1));
@@ -283,7 +285,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 		String fieldName = reader.getLocalName();
 		EStructuralFeature eStructuralFeature = object.eClass().getEStructuralFeature(fieldName);
 		if (eStructuralFeature == null) {
-			throw new DeserializeException("Field " + fieldName + " not found on class " + object.eClass().getName());
+			throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "Field " + fieldName + " not found on class " + object.eClass().getName());
 		}
 		EClassifier realType = null;
 		try {
@@ -300,7 +302,7 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 					} else if (reader.getAttributeValue("", "ref") != null) {
 						String ref = reader.getAttributeValue("", "ref");
 						if (!ref.startsWith("i")) {
-							throw new DeserializeException("Reference id " + ref + " should start with an 'i'");
+							throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "Reference id " + ref + " should start with an 'i'");
 						}
 						Long refId = Long.parseLong(ref.substring(1));
 						IdEObject reference = null;
@@ -430,12 +432,12 @@ public abstract class IfcXmlDeserializer extends EmfDeserializer {
 				if (text.equals("unknown")) {
 					return null;
 				} else {
-					throw new DeserializeException("Unknown enum literal " + text + " in enum " + ((EEnum) eType).getName());
+					throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "Unknown enum literal " + text + " in enum " + ((EEnum) eType).getName());
 				}
 			}
 			return eEnumLiteral.getInstance();
 		} else {
-			throw new DeserializeException("Unimplemented primitive type: " + eType.getName());
+			throw new DeserializeException(DeserializerErrorCode.UNSPECIFIED_IFCXML_ERROR, "Unimplemented primitive type: " + eType.getName());
 		}
 	}
 }

@@ -24,6 +24,7 @@ import org.bimserver.emf.Schema;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.deserializers.EmfDeserializer;
 
+@Deprecated
 public class Ifc2x3tc1XmlDeserializerPlugin extends IfcXmlDeserializerPlugin  {
 
 	@Override

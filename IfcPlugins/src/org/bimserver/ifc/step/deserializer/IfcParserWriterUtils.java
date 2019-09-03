@@ -32,6 +32,7 @@ import org.bimserver.emf.IdEObject;
 import org.bimserver.emf.PackageMetaData;
 import org.bimserver.models.ifc4.Ifc4Package;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.plugins.serializers.SerializerException;
 import org.eclipse.emf.common.util.Enumerator;
 import org.eclipse.emf.ecore.EEnum;
@@ -85,12 +86,12 @@ public class IfcParserWriterUtils {
 				} else if (value.toString().equals("UNDEFINED")) {
 					return eEnum.getEEnumLiteral("UNDEFINED");
 				}
-				throw new DeserializeException(lineNumber, "Unknown value: " + value);
+				throw new DeserializeException(DeserializerErrorCode.NON_EXISTING_ENUM_LITERAL_USED, lineNumber, "Unknown value: " + value);
 			} else if (instanceClass == Double.class || instanceClass == double.class) {
 				try {
 					return Double.parseDouble(value);
 				} catch (NumberFormatException e) {
-					throw new DeserializeException(lineNumber, "Incorrect double floating point value: " + value, e);
+					throw new DeserializeException(DeserializerErrorCode.INVALID_DOUBLE_LITERAL, lineNumber, "Incorrect double floating point value: " + value, e);
 				}
 			} else if (instanceClass == String.class) {
 				if (value.startsWith("'") && value.endsWith("'")) {
@@ -109,12 +110,12 @@ public class IfcParserWriterUtils {
 						throw new DeserializeException(e);
 					}
 				} else {
-					throw new DeserializeException(lineNumber, "Byte[] not starting/ending with \"");
+					throw new DeserializeException(DeserializerErrorCode.BYTE_ARRAY_NOT_QUOTED, lineNumber, "Byte[] not starting/ending with \"");
 				}
 			} else if (IdEObject.class.isAssignableFrom(instanceClass)) {
-				throw new DeserializeException(lineNumber, instanceClass.getSimpleName() + " expected, but got \"" + value + "\"");
+				throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_TYPE, lineNumber, instanceClass.getSimpleName() + " expected, but got \"" + value + "\"");
 			} else {
-				throw new DeserializeException(lineNumber, "Unimplemented " + instanceClass);
+				throw new DeserializeException(DeserializerErrorCode.UNIMPLEMENTED_BIMSERVER_FEATURE, lineNumber, "Unimplemented " + instanceClass);
 			}
 		}
 		return null;

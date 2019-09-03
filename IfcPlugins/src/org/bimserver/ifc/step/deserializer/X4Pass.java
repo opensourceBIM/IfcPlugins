@@ -25,6 +25,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 
 public class X4Pass extends Pass {
 	public String process(long lineNumber, String result) throws DeserializeException {
@@ -32,10 +33,10 @@ public class X4Pass extends Pass {
 			int index = result.indexOf("\\X4\\");
 			int indexOfEnd = result.indexOf("\\X0\\", index);
 			if (indexOfEnd == -1) {
-				throw new DeserializeException(lineNumber, "\\X4\\ not closed with \\X0\\");
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_X4_NOT_CLOSED_WITH_X0, lineNumber, "\\X4\\ not closed with \\X0\\");
 			}
 			if ((indexOfEnd - (index + 4)) % 8 != 0) {
-				throw new DeserializeException(lineNumber, "Number of hex chars in \\X4\\ definition not divisible by 8");
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_NUMBER_OF_HEX_CHARS_IN_X4_NOT_DIVISIBLE_BY_8, lineNumber, "Number of hex chars in \\X4\\ definition not divisible by 8");
 			}
 			try {
 				ByteBuffer buffer = ByteBuffer.wrap(Hex.decodeHex(result.substring(index + 4, indexOfEnd).toCharArray()));
@@ -44,7 +45,7 @@ public class X4Pass extends Pass {
 			} catch (DecoderException e) {
 				throw new DeserializeException(lineNumber, e);
 			} catch (UnsupportedCharsetException e) {
-				throw new DeserializeException(lineNumber, "UTF-32 is not supported on your system", e);
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_UTF32_NOT_SUPPORTED_ON_SYSTEM, lineNumber, "UTF-32 is not supported on your system", e);
 			}
 		}
 		return result;

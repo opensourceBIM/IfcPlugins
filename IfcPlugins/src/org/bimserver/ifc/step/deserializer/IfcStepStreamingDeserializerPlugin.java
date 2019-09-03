@@ -25,6 +25,7 @@ import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
 import org.bimserver.plugins.PluginContext;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import org.bimserver.plugins.deserializers.IfcSchemaDeterminer;
 import org.bimserver.plugins.deserializers.StreamingDeserializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
@@ -57,7 +58,7 @@ public abstract class IfcStepStreamingDeserializerPlugin implements StreamingDes
 			String schemaString = detectIfcVersion.detectVersion(head, usesZip);
 			Schema schema = Schema.fromIfcHeader(schemaString);
 			if (schema == null) {
-				throw new DeserializeException("Unsupported IFC schema: " + schemaString);
+				throw new DeserializeException(DeserializerErrorCode.UNSUPPORTED_IFC_SCHEMA_VERSION, "Unsupported IFC schema: " + schemaString);
 			}
 			return schema;
 		} catch (IOException e) {
