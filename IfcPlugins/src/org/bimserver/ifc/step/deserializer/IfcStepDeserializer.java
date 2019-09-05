@@ -41,6 +41,7 @@ import org.bimserver.ifc.BasicIfcModel;
 import org.bimserver.models.ifc4.Ifc4Package;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
+import org.bimserver.plugins.ObjectAlreadyExistsException;
 import org.bimserver.plugins.deserializers.ByteProgressReporter;
 import org.bimserver.plugins.deserializers.DeserializeException;
 import org.bimserver.plugins.deserializers.DeserializerErrorCode;
@@ -177,12 +178,10 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			if (mode == Mode.HEADER) {
 				throw new DeserializeException(DeserializerErrorCode.NO_VALID_IFC_HEADER_FOUND, lineNumber, "No valid IFC header found");
 			}
-		} catch (FileNotFoundException e) {
-			throw new DeserializeException(lineNumber, e);
 		} catch (IOException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.IO_EXCEPTION, lineNumber, e);
 		} catch (NoSuchAlgorithmException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.INTERNAL_BIMSERVER_ERROR, lineNumber, e);
 		}
 		return model;
 	}
@@ -196,9 +195,9 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			model.getModelMetaData().setName(sourceFile.getName());
 			return model;
 		} catch (FileNotFoundException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.FILE_NOT_FOUND_EXCEPTION, lineNumber, e);
 		} catch (IOException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.IO_EXCEPTION, lineNumber, e);
 		}
 	}
 
@@ -247,33 +246,29 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 	}
 
 	private void processHeader(String line) throws DeserializeException {
-		try {
-			IfcHeader ifcHeader = model.getModelMetaData().getIfcHeader();
-			if (ifcHeader == null) {
-				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
-				model.getModelMetaData().setIfcHeader(ifcHeader);
-			}
-			
-			if (line.startsWith("FILE_DESCRIPTION")) {
-				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
-				new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
-			} else if (line.startsWith("FILE_NAME")) {
-				String filename = line.substring("FILE_NAME".length()).trim();
-				new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
-			} else if (line.startsWith("FILE_SCHEMA")) {
-				String fileschema = line.substring("FILE_SCHEMA".length()).trim();
-				new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
+		IfcHeader ifcHeader = model.getModelMetaData().getIfcHeader();
+		if (ifcHeader == null) {
+			ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+			model.getModelMetaData().setIfcHeader(ifcHeader);
+		}
+		
+		if (line.startsWith("FILE_DESCRIPTION")) {
+			String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
+			new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
+		} else if (line.startsWith("FILE_NAME")) {
+			String filename = line.substring("FILE_NAME".length()).trim();
+			new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
+		} else if (line.startsWith("FILE_SCHEMA")) {
+			String fileschema = line.substring("FILE_SCHEMA".length()).trim();
+			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
 
-				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
-				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
-					throw new DeserializeException(DeserializerErrorCode.UNSUPPORTED_IFC_SCHEMA_VERSION, lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
-				}
-				ifcHeader.setIfcSchemaVersion(ifcSchemaVersion);
-			} else if (line.startsWith("ENDSEC;")) {
-				// Do nothing
+			String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
+			if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
+				throw new DeserializeException(DeserializerErrorCode.UNSUPPORTED_IFC_SCHEMA_VERSION, lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
 			}
-		} catch (ParseException e) {
-			throw new DeserializeException(lineNumber, e);
+			ifcHeader.setIfcSchemaVersion(ifcSchemaVersion);
+		} else if (line.startsWith("ENDSEC;")) {
+			// Do nothing
 		}
 	}
 
@@ -298,8 +293,8 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 			IdEObject object = (IdEObject) getPackageMetaData().create(eClass);
 			try {
 				model.add(recordNumber, object);
-			} catch (IfcModelInterfaceException e) {
-				throw new DeserializeException(lineNumber, e);
+			} catch (ObjectAlreadyExistsException e) {
+				throw new DeserializeException(DeserializerErrorCode.DUPLICATE_EXPRESS_ID, lineNumber, e);
 			}
 			((IdEObjectImpl) object).setExpressId(recordNumber);
 			String realData = line.substring(indexOfFirstParen + 1, indexOfLastParen);
@@ -514,8 +509,8 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 				Object convert = convert(eStructuralFeature, eClassifier, v);
 				try {
 					model.add(-1, (IdEObject) convert);
-				} catch (IfcModelInterfaceException e) {
-					throw new DeserializeException(lineNumber, e);
+				} catch (ObjectAlreadyExistsException e) {
+					throw new DeserializeException(DeserializerErrorCode.DUPLICATE_EXPRESS_ID, lineNumber, e);
 				}
 				return convert;
 			} else {

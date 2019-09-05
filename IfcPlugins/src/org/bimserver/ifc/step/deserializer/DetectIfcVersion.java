@@ -19,7 +19,6 @@ package org.bimserver.ifc.step.deserializer;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -110,10 +109,8 @@ public class DetectIfcVersion {
 				lineNumber++;
 			}
 			return lineNumber;
-		} catch (FileNotFoundException e) {
-			throw new DeserializeException(lineNumber, e);
 		} catch (IOException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.IO_EXCEPTION, lineNumber, e);
 		}
 	}
 	

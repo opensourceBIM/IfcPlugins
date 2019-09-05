@@ -45,7 +45,7 @@ public class X2Pass extends Pass {
 				CharBuffer decode = Charsets.UTF_16BE.decode(buffer);
 				result = result.substring(0, index) + decode.toString() + result.substring(indexOfEnd + 4);
 			} catch (DecoderException e) {
-				throw new DeserializeException(lineNumber, e);
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_CHARACTER_DECODING_EXCEPTION, lineNumber, e);
 			}
 		}
 		return result;

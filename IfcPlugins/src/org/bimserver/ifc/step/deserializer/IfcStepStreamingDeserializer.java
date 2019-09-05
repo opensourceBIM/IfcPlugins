@@ -221,12 +221,10 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				throw new DeserializeException(DeserializerErrorCode.NO_VALID_IFC_HEADER_FOUND, lineNumber, "No valid IFC header found");
 			}
 			return lineNumber;
-		} catch (FileNotFoundException e) {
-			throw new DeserializeException(lineNumber, e);
 		} catch (IOException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.IO_EXCEPTION, lineNumber, e);
 		} catch (NoSuchAlgorithmException e) {
-			throw new DeserializeException(lineNumber, e);
+			throw new DeserializeException(DeserializerErrorCode.INTERNAL_BIMSERVER_ERROR, lineNumber, e);
 		}
 	}
 
@@ -280,36 +278,32 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	}
 	
 	private void processHeader(String line) throws DeserializeException {
-		try {
-			if (ifcHeader == null) {
-				ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+		if (ifcHeader == null) {
+			ifcHeader = StoreFactory.eINSTANCE.createIfcHeader();
+		}
+		((IdEObjectImpl)ifcHeader).setUuid(UUID.randomUUID());
+		if (line.startsWith("/*")) {
+			if (line.contains("*/")) {
+				line = line.substring(line.indexOf("*/") + 2);
 			}
-			((IdEObjectImpl)ifcHeader).setUuid(UUID.randomUUID());
-			if (line.startsWith("/*")) {
-				if (line.contains("*/")) {
-					line = line.substring(line.indexOf("*/") + 2);
-				}
-			}
-			if (line.startsWith("FILE_DESCRIPTION")) {
-				String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
-				new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
-			} else if (line.startsWith("FILE_NAME")) {
-				String filename = line.substring("FILE_NAME".length()).trim();
-				new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
-			} else if (line.startsWith("FILE_SCHEMA")) {
-				String fileschema = line.substring("FILE_SCHEMA".length()).trim();
-				new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
+		}
+		if (line.startsWith("FILE_DESCRIPTION")) {
+			String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
+			new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
+		} else if (line.startsWith("FILE_NAME")) {
+			String filename = line.substring("FILE_NAME".length()).trim();
+			new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
+		} else if (line.startsWith("FILE_SCHEMA")) {
+			String fileschema = line.substring("FILE_SCHEMA".length()).trim();
+			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
 
-				String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
-				if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
-					throw new DeserializeException(DeserializerErrorCode.IFC_SCHEMA_NOT_SUPPORTED_BY_DESERIALIZER, lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
-				}
-				ifcHeader.setIfcSchemaVersion(ifcSchemaVersion);
-			} else if (line.startsWith("ENDSEC;")) {
-				// Do nothing
+			String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
+			if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
+				throw new DeserializeException(DeserializerErrorCode.IFC_SCHEMA_NOT_SUPPORTED_BY_DESERIALIZER, lineNumber, ifcSchemaVersion + " is not supported by this deserializer (" + schema.getHeaderName() + " is)");
 			}
-		} catch (ParseException e) {
-			throw new DeserializeException(lineNumber, e);
+			ifcHeader.setIfcSchemaVersion(ifcSchemaVersion);
+		} else if (line.startsWith("ENDSEC;")) {
+			// Do nothing
 		}
 	}
 
@@ -385,6 +379,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							throw new DeserializeException(DeserializerErrorCode.NOT_ENOUGH_FIELDS_FOR_ENTITY, lineNumber, eClass.getName() + " expects " + expected + " fields, but less found (" + e.getMessage() + ")", e);
 						}
 						lastIndex = nextIndex;
+						if (val.length() == 0) {
+							throw new DeserializeException(DeserializerErrorCode.EXPECTED_CHARACTER_BUT_EMPTY_FIELD, "Expected non-comma character, but field value length is 0");
+						}
 						char firstChar = val.charAt(0);
 						if (firstChar == '$') {
 							object.eUnset(eStructuralFeature);

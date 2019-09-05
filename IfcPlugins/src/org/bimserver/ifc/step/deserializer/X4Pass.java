@@ -43,7 +43,7 @@ public class X4Pass extends Pass {
 				CharBuffer decode = Charset.forName("UTF-32").decode(buffer);
 				result = result.substring(0, index) + decode.toString() + result.substring(indexOfEnd + 4);
 			} catch (DecoderException e) {
-				throw new DeserializeException(lineNumber, e);
+				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_CHARACTER_DECODING_EXCEPTION, lineNumber, e);
 			} catch (UnsupportedCharsetException e) {
 				throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_UTF32_NOT_SUPPORTED_ON_SYSTEM, lineNumber, "UTF-32 is not supported on your system", e);
 			}

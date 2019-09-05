@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import org.bimserver.models.store.IfcHeader;
 import org.bimserver.models.store.StoreFactory;
 import org.bimserver.plugins.deserializers.DeserializeException;
+import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 
 public class IfcHeaderParser {
 
@@ -38,7 +39,7 @@ public class IfcHeaderParser {
 		return ifcHeader;
 	}
 	
-	public void parseDescription(String line, IfcHeader ifcHeader) throws DeserializeException, ParseException {
+	public void parseDescription(String line, IfcHeader ifcHeader) throws DeserializeException {
 		line = line.replace("\r\n", "");
 
 		StepParser stepParser = new StepParser(line);
@@ -49,13 +50,17 @@ public class IfcHeaderParser {
 		ifcHeader.setImplementationLevel(stepParser.readNextString());
 	}
 	
-	public void parseFileName(String line, IfcHeader ifcHeader) throws DeserializeException, ParseException {
+	public void parseFileName(String line, IfcHeader ifcHeader) throws DeserializeException {
 		line = line.replace("\r\n", "");
 		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss");
 
 		StepParser stepParser = new StepParser(line);
 		ifcHeader.setFilename(stepParser.readNextString());
-		ifcHeader.setTimeStamp(dateFormatter.parse(stepParser.readNextString()));
+		try {
+			ifcHeader.setTimeStamp(dateFormatter.parse(stepParser.readNextString()));
+		} catch (ParseException e) {
+			throw new DeserializeException(DeserializerErrorCode.INVALID_DATETIME_LITERAL, "Datetime parse error", e);
+		}
 		StepParser startList = stepParser.startList();
 		while (startList.hasMoreListItems()) {
 			ifcHeader.getAuthor().add(startList.readNextString());
