@@ -18,13 +18,11 @@ package org.bimserver.ifc.step.deserializer;
  *****************************************************************************/
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +34,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.bimserver.BimserverDatabaseException;
+import org.bimserver.CannotStoreReferenceInFieldException;
 import org.bimserver.database.MetricCollector;
 import org.bimserver.emf.IdEObjectImpl;
 import org.bimserver.emf.MetaDataException;
@@ -63,9 +62,10 @@ import org.bimserver.shared.SingleWaitingVirtualObject;
 import org.bimserver.shared.TwoDimensionalListWaitingVirtualObject;
 import org.bimserver.shared.VirtualObject;
 import org.bimserver.shared.WaitingListVirtualObject;
-import org.bimserver.shared.exceptions.BimServerClientException;
+import org.bimserver.shared.WrappedVirtualObject;
 import org.bimserver.utils.FakeClosingInputStream;
 import org.bimserver.utils.StringUtils;
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EDataType;
@@ -162,10 +162,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						throw new DeserializeException(DeserializerErrorCode.IFCZIP_CONTAINS_EMPTY_IFC_MODEL, "Uploaded file does not seem to be a correct IFC file");
 					}
 					if (zipInputStream.getNextEntry() != null) {
-						zipInputStream.close();
 						throw new DeserializeException(DeserializerErrorCode.IFCZIP_FILE_CONTAINS_TOO_MANY_FILES, "Zip files may only contain one IFC-file, this zip-file contains more files");
-					} else {
-						zipInputStream.close();
 					}
 					return size;
 				} else {
@@ -245,11 +242,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		case DATA:
 			if (line.equals("ENDSEC;")) {
 				mode = Mode.FOOTER;
-				try {
-					waitingList.dumpIfNotEmpty();
-				} catch (BimServerClientException e) {
-					throw new DeserializeException(e);
-				}
+				waitingList.dumpIfNotEmpty();
 			} else {
 				if (line.length() > 0 && line.charAt(0) == '#') {
 					while (line.endsWith("*/")) {
@@ -394,7 +387,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 								openReferences = true;
 							}
 						} else if (firstChar == '.') {
-							readEnum(val, object, eStructuralFeature);
+							readEnum(val, object, (EAttribute) eStructuralFeature);
 						} else if (firstChar == '(') {
 							if (!readList(val, (ListCapableVirtualObject) object, eStructuralFeature, object, -1)) {
 								openReferences = true;
@@ -407,11 +400,15 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 								if (eStructuralFeature.getName().equals("GlobalId")) {
 									processGuid(object, eStructuralFeature, converted);
 								} else {
-									object.setAttribute(eStructuralFeature, converted);
+									if (eStructuralFeature instanceof EAttribute) {
+										object.setAttribute((EAttribute) eStructuralFeature, converted);
+									} else {
+										object.setReference((EReference) eStructuralFeature, (WrappedVirtualObject)converted);
+									}
 								}
 								if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
-									object.setAttribute(doubleStringFeature, val);
+									object.setAttribute((EAttribute) doubleStringFeature, val);
 								}
 							} else {
 								// It's not a list in the file, but it is in the
@@ -450,7 +447,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private void processGuid(VirtualObject object, EStructuralFeature eStructuralFeature, Object converted) throws BimserverDatabaseException, DeserializeException {
 		try {
 			GuidCompressor.getGuidFromCompressedString(converted.toString(), new Guid());
-			object.setAttribute(eStructuralFeature, converted);
+			object.setAttribute((EAttribute) eStructuralFeature, converted);
 			// If it's valid, we do nothing, we just store it as it was
 		} catch (InvalidGuidException e) {
 			if (CONVERT_INVALID_IFC_GUIDS) {
@@ -461,7 +458,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					String ifcGuid = GuidCompressor.compressGuidString(uuid.toString());
 					LOGGER.warn("Invalid GUID on line " + lineNumber + " , converted from default UUID format (" + uuid.toString() + ") to IFC format (" + ifcGuid + ")");
 					// If this succeeds, we convert the UUID to the IFC format, and store that, so this "changes" the model
-					object.setAttribute(eStructuralFeature, ifcGuid);
+					object.setAttribute((EAttribute) eStructuralFeature, ifcGuid);
 				} catch (Exception e2) {
 					// We use the original exception's message, since that is most accurate
 					throw new DeserializeException(DeserializerErrorCode.INVALID_GUID, "Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
@@ -567,7 +564,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (classifier != null) {
 			if (classifier instanceof EClassImpl) {
 				if (null != ((EClassImpl) classifier).getEStructuralFeature(WRAPPED_VALUE)) {
-					EStructuralFeature wrappedFeature = ((EClass) classifier).getEStructuralFeature(WRAPPED_VALUE);
+					EAttribute wrappedFeature = (EAttribute) ((EClass) classifier).getEStructuralFeature(WRAPPED_VALUE);
 					if (wrappedFeature.isMany()) {
 						ByteBufferList object = new ByteBufferList(reusable, (EClass) classifier);
 						readList(value, object, wrappedFeature, null, -1);
@@ -594,7 +591,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 								} catch (NumberFormatException e) {
 									throw new DeserializeException(DeserializerErrorCode.INVALID_DOUBLE_LITERAL, lineNumber, value + " is not a valid double floating point number");
 								}
-								newObject.setAttribute(newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
+								newObject.setAttribute((EAttribute) newObject.eClass().getEStructuralFeature(WRAPPED_VALUE + "AsString"), value);
 							} else if (instanceClass == String.class) {
 								newObject.setAttribute(wrappedFeature, IfcParserWriterUtils.readString(value, lineNumber));
 							} else if (instanceClass.getSimpleName().equals("Tristate")) {
@@ -646,21 +643,21 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		}
 	}
 
-	private void readEnum(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
+	private void readEnum(String val, VirtualObject object, EAttribute structuralFeature) throws DeserializeException, MetaDataException, BimserverDatabaseException {
 		if (val.equals(".T.")) {
 			if (structuralFeature.getEType().getName().equals("Tristate")) {
 				object.setAttribute(structuralFeature, getPackageMetaData().getEEnumLiteral("Tristate", "TRUE").getInstance());
 			} else if (structuralFeature.getEType().getName().equals("IfcBoolean")) {
 				EClass eClass = getPackageMetaData().getEClass("IfcBoolean");
 				VirtualObject createIfcBoolean = newVirtualObject(eClass, val.length());
-				createIfcBoolean.setAttribute(eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "TRUE").getInstance());
+				createIfcBoolean.setAttribute((EAttribute) eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "TRUE").getInstance());
 				object.setAttribute(structuralFeature, createIfcBoolean);
 			} else if (structuralFeature.getEType() == EcorePackage.eINSTANCE.getEBoolean()) {
 				object.setAttribute(structuralFeature, true);
 			} else {
 				EClass eClass = getPackageMetaData().getEClass("IfcLogical");
 				VirtualObject createIfcBoolean = newVirtualObject(eClass, val.length());
-				createIfcBoolean.setAttribute(eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "TRUE").getInstance());
+				createIfcBoolean.setAttribute((EAttribute) eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "TRUE").getInstance());
 				object.setAttribute(structuralFeature, createIfcBoolean);
 			}
 		} else if (val.equals(".F.")) {
@@ -669,14 +666,14 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			} else if (structuralFeature.getEType().getName().equals("IfcBoolean")) {
 				EClass eClass = getPackageMetaData().getEClass("IfcBoolean");
 				VirtualObject createIfcBoolean = newVirtualObject(eClass, val.length());
-				createIfcBoolean.setAttribute(eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "FALSE").getInstance());
+				createIfcBoolean.setAttribute((EAttribute) eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "FALSE").getInstance());
 				object.setAttribute(structuralFeature, createIfcBoolean);
 			} else if (structuralFeature.getEType() == EcorePackage.eINSTANCE.getEBoolean()) {
 				object.setAttribute(structuralFeature, false);
 			} else {
 				EClass eClass = getPackageMetaData().getEClass("IfcLogical");
 				VirtualObject createIfcBoolean = newVirtualObject(eClass, val.length());
-				createIfcBoolean.setAttribute(eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "FALSE").getInstance());
+				createIfcBoolean.setAttribute((EAttribute) eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "FALSE").getInstance());
 				object.setAttribute(structuralFeature, createIfcBoolean);
 			}
 		} else if (val.equals(".U.")) {
@@ -687,7 +684,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 			} else {
 				EClass eClass = getPackageMetaData().getEClass("IfcLogical");
 				VirtualObject createIfcBoolean = newVirtualObject(eClass, val.length());
-				createIfcBoolean.setAttribute(eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "UNDEFINED").getInstance());
+				createIfcBoolean.setAttribute((EAttribute) eClass.getEStructuralFeature("WrappedValue"), getPackageMetaData().getEEnumLiteral("Tristate", "UNDEFINED").getInstance());
 				object.setAttribute(structuralFeature, createIfcBoolean);
 			}
 		} else {
@@ -714,14 +711,18 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private boolean readReference(String val, VirtualObject object, EStructuralFeature structuralFeature) throws DeserializeException, BimserverDatabaseException {
 		if (structuralFeature == Ifc4Package.eINSTANCE.getIfcIndexedColourMap_Opacity()) {
 			// HACK for IFC4/add1/add2
-			object.setAttribute(structuralFeature, 0D);
-			object.setAttribute(structuralFeature.getEContainingClass().getEStructuralFeature(structuralFeature.getName() + "AsString"), "0");
+			object.setAttribute((EAttribute) structuralFeature, 0D);
+			object.setAttribute((EAttribute) structuralFeature.getEContainingClass().getEStructuralFeature(structuralFeature.getName() + "AsString"), "0");
 			return true;
 		}
 		try {
 			long referenceId = Long.parseLong(val.substring(1));
 			if (mappedObjects.containsKey(referenceId)) {
-				object.setReference(structuralFeature, mappedObjects.get(referenceId), -1);
+				try {
+					object.setReference((EReference) structuralFeature, mappedObjects.get(referenceId), -1);
+				} catch (CannotStoreReferenceInFieldException e) {
+					throw new DeserializeException(e.getDeserializerErrorCode(), e.getMessage());
+				}
 				return true;
 			} else {
 				int pos = object.reserveSpaceForReference(structuralFeature);
