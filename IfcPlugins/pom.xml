@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opensourcebim</groupId>
   <artifactId>ifcplugins</artifactId>
-  <version>0.0.88-SNAPSHOT</version>
+  <version>0.0.88</version>
   <name>IfcPlugins</name>
   <description>BIMserver plugin that provides IFC serializers/deserializers</description>
   <url>https://github.com/opensourceBIM/IfcPlugins/BIMserver</url>
@@ -28,7 +27,7 @@
   <scm>
     <connection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</connection>
     <developerConnection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</developerConnection>
-    <tag>ifcplugins-0.0.32</tag>
+    <tag>ifcplugins-0.0.88</tag>
     <url>https://github.com/opensourceBIM/IfcPlugins.git</url>
   </scm>
   <issueManagement>
