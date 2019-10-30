@@ -373,7 +373,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						}
 						lastIndex = nextIndex;
 						if (val.length() == 0) {
-							throw new DeserializeException(DeserializerErrorCode.EXPECTED_CHARACTER_BUT_EMPTY_FIELD, "Expected non-comma character, but field value length is 0");
+							throw new DeserializeException(DeserializerErrorCode.EXPECTED_CHARACTER_BUT_EMPTY_FIELD, lineNumber, "Expected non-comma character, but field value length is 0");
 						}
 						char firstChar = val.charAt(0);
 						if (firstChar == '$') {
@@ -461,10 +461,10 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					object.setAttribute((EAttribute) eStructuralFeature, ifcGuid);
 				} catch (Exception e2) {
 					// We use the original exception's message, since that is most accurate
-					throw new DeserializeException(DeserializerErrorCode.INVALID_GUID, "Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
+					throw new DeserializeException(DeserializerErrorCode.INVALID_GUID, lineNumber, "Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
 				}
 			} else {
-				throw new DeserializeException(DeserializerErrorCode.INVALID_GUID, "Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
+				throw new DeserializeException(DeserializerErrorCode.INVALID_GUID, lineNumber, "Invalid GUID: \"" + converted.toString() + "\": " + e.getMessage());
 			}
 		}
 	}
@@ -516,7 +516,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							waitingList.add(referenceId, new ListWaitingVirtualObject(lineNumber, (VirtualObject) object, structuralFeature, index, pos));
 						} else if (object instanceof ByteBufferList) {
 							if (parentObject == null) {
-								throw new DeserializeException(DeserializerErrorCode.INTERNAL_BIMSERVER_ERROR, "Need a parentObject");
+								throw new DeserializeException(DeserializerErrorCode.INTERNAL_BIMSERVER_ERROR, lineNumber, "Need a parentObject");
 							}
 							waitingList.add(referenceId, new TwoDimensionalListWaitingVirtualObject(lineNumber, parentObject, (ByteBufferList) object, structuralFeature, parentIndex, index, pos));
 						}
@@ -721,7 +721,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				try {
 					object.setReference((EReference) structuralFeature, mappedObjects.get(referenceId), -1);
 				} catch (CannotStoreReferenceInFieldException e) {
-					throw new DeserializeException(e.getDeserializerErrorCode(), e.getMessage());
+					throw new DeserializeException(e.getDeserializerErrorCode(), lineNumber, e.getMessage());
 				}
 				return true;
 			} else {
