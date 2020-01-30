@@ -1,28 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PluginDescriptor>
 	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.serializers.JsonSerializerPlugin</implementationClass>
-		<description>JsonSerializer</description>
-		<name>Json</name>
-	</JavaPlugin>
-	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.serializers.JsonStreamingSerializerPlugin</implementationClass>
 		<description>JsonStreamingSerializer</description>
 		<name>Json (Streaming)</name>
-	</JavaPlugin>
-	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.serializers.MinimalJsonStreamingSerializerPlugin</implementationClass>
-		<description>MinimalJsonStreamingSerializer</description>
-		<name>Minimal Json (Streaming)</name>
-	</JavaPlugin>
-	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.serializers.JsonSerializerPluginWithGeometry</implementationClass>
-		<description>JsonSerializerWithGeometry</description>
-		<name>Json (With Geometry)</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.deserializers.DeserializerPlugin</interfaceClass>

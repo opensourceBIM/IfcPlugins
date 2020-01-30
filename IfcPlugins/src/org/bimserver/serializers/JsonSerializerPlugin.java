@@ -27,6 +27,11 @@ import org.bimserver.plugins.serializers.AbstractSerializerPlugin;
 import org.bimserver.plugins.serializers.EmfSerializer;
 import org.bimserver.shared.exceptions.PluginException;
 
+/**
+ * @author Ruben de Laat
+ * Deprecated, use the JsonStreamingSerializer
+ */
+@Deprecated
 public class JsonSerializerPlugin extends AbstractSerializerPlugin {
 
 	@Override

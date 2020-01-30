@@ -26,6 +26,11 @@ import org.bimserver.plugins.serializers.ProgressReporter;
 import org.bimserver.plugins.serializers.ProjectInfo;
 import org.bimserver.plugins.serializers.SerializerException;
 
+/**
+ * @author Ruben de Laat
+ * Deprecated, use the JsonStreamingSerializer
+ */
+@Deprecated
 public class JsonSerializer extends IfcSerializer {
 
 	private SharedJsonSerializer sharedJsonSerializer;

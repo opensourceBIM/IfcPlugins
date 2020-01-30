@@ -33,6 +33,11 @@ import org.bimserver.plugins.serializers.SerializerInputstream;
 import org.bimserver.plugins.serializers.StreamingReader;
 import org.bimserver.plugins.serializers.StreamingSerializer;
 
+/**
+ * @author Ruben de Laat
+ * Deprecated, use the JsonStreamingSerializer
+ */
+@Deprecated
 public class MinimalStreamingJsonSerializer implements StreamingSerializer, StreamingReader {
 
 	private ObjectProvider objectProvider;

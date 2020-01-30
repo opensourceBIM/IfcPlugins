@@ -33,6 +33,11 @@ import org.bimserver.plugins.serializers.StreamingSerializer;
 import org.bimserver.plugins.serializers.StreamingSerializerPlugin;
 import org.bimserver.shared.exceptions.PluginException;
 
+/**
+ * @author Ruben de Laat
+ * Deprecated, use the JsonStreamingSerializer
+ */
+@Deprecated
 public class MinimalJsonStreamingSerializerPlugin implements StreamingSerializerPlugin {
 
 	@Override
