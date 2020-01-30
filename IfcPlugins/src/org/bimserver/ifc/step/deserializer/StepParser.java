@@ -34,13 +34,13 @@ public class StepParser {
 		lastIndex = StringUtils.nextField(this.line, 0);
 	}
 
-	public String readNextString() throws DeserializeException {
+	public String readNextString(long lineNumber) throws DeserializeException {
 		int nextIndex = StringUtils.nextString(line, lastIndex);
 		String val = null;
 		try {
 			val = line.substring(lastIndex, nextIndex - 1).trim();
 		} catch (Exception e) {
-			throw new DeserializeException(DeserializerErrorCode.EXPECTED_STRING, 0, "Expected string");
+			throw new DeserializeException(DeserializerErrorCode.EXPECTED_STRING, lineNumber, "Expected string");
 		}
 		lastIndex = StringUtils.nextField(this.line, nextIndex);
 		

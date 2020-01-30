@@ -141,7 +141,7 @@ public class DetectIfcVersion {
 		}
 		if (line.startsWith("FILE_SCHEMA")) {
 			String fileschema = line.substring("FILE_SCHEMA".length()).trim();
-			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
+			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader, lineNumber);
 			return true;
 		} else if (line.startsWith("ENDSEC;")) {
 			return true;

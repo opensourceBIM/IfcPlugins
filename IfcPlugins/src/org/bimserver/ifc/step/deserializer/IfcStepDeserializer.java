@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -34,7 +33,6 @@ import java.util.zip.ZipInputStream;
 import org.bimserver.emf.IdEObject;
 import org.bimserver.emf.IdEObjectImpl;
 import org.bimserver.emf.IfcModelInterface;
-import org.bimserver.emf.IfcModelInterfaceException;
 import org.bimserver.emf.MetaDataException;
 import org.bimserver.emf.Schema;
 import org.bimserver.ifc.BasicIfcModel;
@@ -89,7 +87,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 	private final WaitingList<Long> waitingList = new WaitingList<>();
 	private Mode mode = Mode.HEADER;
 	private IfcModelInterface model;
-	private long lineNumber;
+	private int lineNumber;
 	private Schema schema;
 
 	public enum Mode {
@@ -254,13 +252,13 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		
 		if (line.startsWith("FILE_DESCRIPTION")) {
 			String filedescription = line.substring("FILE_DESCRIPTION".length()).trim();
-			new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader);
+			new IfcHeaderParser().parseDescription(filedescription.substring(1, filedescription.length() - 2), ifcHeader, lineNumber);
 		} else if (line.startsWith("FILE_NAME")) {
 			String filename = line.substring("FILE_NAME".length()).trim();
-			new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader);
+			new IfcHeaderParser().parseFileName(filename.substring(1, filename.length() - 2), ifcHeader, lineNumber);
 		} else if (line.startsWith("FILE_SCHEMA")) {
 			String fileschema = line.substring("FILE_SCHEMA".length()).trim();
-			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader);
+			new IfcHeaderParser().parseFileSchema(fileschema.substring(1, fileschema.length() - 2), ifcHeader, lineNumber);
 
 			String ifcSchemaVersion = ifcHeader.getIfcSchemaVersion();
 			if (!ifcSchemaVersion.toLowerCase().equalsIgnoreCase(schema.getHeaderName().toLowerCase())) {
