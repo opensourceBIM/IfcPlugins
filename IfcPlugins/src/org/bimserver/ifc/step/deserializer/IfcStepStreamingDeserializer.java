@@ -107,6 +107,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	
 	// Use String instead of EClass, compare takes 1.7%
 	private final Map<String, AtomicInteger> summaryMap = new TreeMap<>();
+	private int numberOfEntitiesRead;
 
 	@Override
 	public void init(PackageMetaData packageMetaData) {
@@ -164,7 +165,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 					if (zipInputStream.getNextEntry() != null) {
 						throw new DeserializeException(DeserializerErrorCode.IFCZIP_FILE_CONTAINS_TOO_MANY_FILES, "Zip files may only contain one IFC-file, this zip-file contains more files");
 					}
-					return size;
+					return numberOfEntitiesRead;
 				} else {
 					throw new DeserializeException(DeserializerErrorCode.IFCZIP_MUST_CONTAIN_EXACTLY_ONE_IFC_FILE, "Zip files must contain exactly one IFC-file, this zip-file seems to have one or more non-IFC files");
 				}
@@ -172,7 +173,8 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				throw new DeserializeException(e);
 			}
 		} else {
-			return read(in, fileSize);
+			read(in, fileSize);
+			return numberOfEntitiesRead;
 		}
 	}
 
@@ -322,6 +324,9 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 		if (indexOfLastParen == -1) {
 			throw new DeserializeException(DeserializerErrorCode.NO_RIGHT_PARENTHESIS_FOUND_IN_RECORD, lineNumber, "No right parenthesis found in line");
 		}
+		
+		this.numberOfEntitiesRead++;
+		
 		long recordNumber = Long.parseLong(line.substring(1, equalSignLocation).trim());
 		String name = line.substring(equalSignLocation + 1, indexOfFirstParen).trim();
 		EClass eClass = (EClass) getPackageMetaData().getEClassifierCaseInsensitive(name);
