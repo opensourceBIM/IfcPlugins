@@ -449,6 +449,8 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 					Class<?> instanceClass = newObject.eClass().getEStructuralFeature(WRAPPED_VALUE).getEType().getInstanceClass();
 					if (value.equals("")) {
 
+					} else if (value.charAt(0) == '(') {
+						readList(value, newObject, newObject.eClass().getEStructuralFeature(WRAPPED_VALUE));
 					} else {
 						if (instanceClass == Integer.class || instanceClass == int.class) {
 							try {
