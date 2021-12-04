@@ -144,24 +144,7 @@ public class IfcParserWriterUtils {
 			int index = result.indexOf("''");
 			result = result.substring(0, index) + "'" + result.substring(index + 2);
 		}
-		
-		for (ParserPlan parserPlan : plans) {
-			try {
-				result = parserPlan.process(lineNumber, result);
-				break;
-			} catch (NumberFormatException e) {
-				if (parserPlan == plans[plans.length -1]) {
-					throw e;
-				}
-				// Try the next plan
-			}
-		}
-		// Replace all \\ with \
-		while (result.contains("\\\\")) {
-			int index = result.indexOf("\\\\");
-			result = result.substring(0, index) + "\\" + result.substring(index + 2);
-		}
-		return result;
+		return new StringDecoder(result, lineNumber).decode();
 	}
 
 	public static void writePrimitive(Object val, OutputStream outputStream) throws SerializerException, IOException {
