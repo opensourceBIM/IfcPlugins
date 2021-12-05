@@ -28,16 +28,14 @@ public class TestStringDecode {
 	public void testOrder() {
 		try {
 			Assert.assertEquals("【S】铝合金-浅灰色（窗框）", IfcParserWriterUtils.readString("'\\X2\\3010\\X0\\S\\X2\\301194DD540891D1\\X0\\-\\X2\\6D4570708272FF087A976846FF09\\X0\\'", 0));
-                        // Nordic character in UTF-16:
-                        Assert.assertEquals("Vaffelrøre", IfcParserWriterUtils.readString("'Vaffelr\\X2\\00F8\\X0\\re'", 0));
-                        // Nordic character in UTF-32:
-                        Assert.assertEquals("Vaffelrøre", IfcParserWriterUtils.readString("'Vaffelr\\X4\\000000F8\\X0\\re'", 0));
-                        
+            // Nordic character in UTF-16:
+            Assert.assertEquals("Vaffelrøre", IfcParserWriterUtils.readString("'Vaffelr\\X2\\00F8\\X0\\re'", 0));
+            // Nordic character in UTF-32:
+            Assert.assertEquals("Vaffelrøre", IfcParserWriterUtils.readString("'Vaffelr\\X4\\000000F8\\X0\\re'", 0));
+
             Assert.assertEquals("Åäèíèöà", IfcParserWriterUtils.readString("'\\S\\E\\S\\d\\S\\h\\S\\m\\S\\h\\S\\v\\S\\`'", 0));
             Assert.assertEquals("Øòóê", IfcParserWriterUtils.readString("'\\S\\X\\S\\r\\S\\s\\S\\j'", 0));
-            
             Assert.assertEquals("转角", IfcParserWriterUtils.readString("'\\X2\\8F6C89D2\\X0\\'", 0));
-
             Assert.assertEquals("/*", IfcParserWriterUtils.readString("'/*'", 0));
             Assert.assertEquals("Fläche", IfcParserWriterUtils.readString("'Fl\\X2\\00E4\\X0\\che'", 0));
             Assert.assertEquals("Länge", IfcParserWriterUtils.readString("'L\\X2\\00E4\\X0\\nge'", 0));
