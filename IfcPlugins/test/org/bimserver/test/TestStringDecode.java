@@ -50,8 +50,32 @@ public class TestStringDecode {
             // Assert.assertEquals("REALIZAČNÝ PROJEKT", IfcParserWriterUtils.readString("'REALIZA\\X\\C8N\\X\\DD PROJEKT'", 0)); // This is ISO 8859-2, but \\X\\ directive does not work this way
             Assert.assertEquals("ÄÜÖ", IfcParserWriterUtils.readString("'\\S\\D\\S\\\\\\S\\V'",0));
             Assert.assertEquals("0.00 \\X\\B0C", IfcParserWriterUtils.readString("'0.00 \\\\X\\\\B0C'", 0));
+            String lorem = "'Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat. Quis aute iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'";
+            Assert.assertEquals( lorem.substring(1, lorem.length()-1) , IfcParserWriterUtils.readString(lorem, 0));
 		} catch (DeserializeException e) {
 			Assert.fail(e.getMessage());
 		}
-	}
+    }
+
+    @Test(expected = DeserializeException.class)
+    public void testWrongDanglingBackslash () throws DeserializeException {
+        IfcParserWriterUtils.readString("'one \\ two'", 0);
+    }
+
+    @Test(expected = DeserializeException.class)
+    public void testDirectiveXMissingBackslash () throws DeserializeException {
+        IfcParserWriterUtils.readString("'one \\Xtwo'", 0);
+    }
+
+    @Test(expected = DeserializeException.class)
+    public void testDirectiveXMissingEnd () throws DeserializeException {
+        IfcParserWriterUtils.readString("'L\\X2\\00E4nge'", 0);
+    }
+
+    @Test
+    public void testPerformance() throws DeserializeException {
+        for (int i=0; i<10000; i++){
+            testOrder();
+        }
+    }
 }

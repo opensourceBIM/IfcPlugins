@@ -9,7 +9,6 @@ import org.bimserver.plugins.deserializers.DeserializerErrorCode;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,31 +22,31 @@ public class StringDecoder {
     }
     private String alphabet;
     private final StringBuffer decoded = new StringBuffer();
-    private final StringCharacterIterator encoded;
-    private final String encodedString;
+    private final StringCharacterIterator encodedIterator;
+    private final String encodedString; // TODO can we avoid the copy and keep it efficient?
     private final long lineNumber;
 
     public StringDecoder(String encoded, long lineNumber){
         alphabet = alphabets.get('A');
-        this.encoded = new StringCharacterIterator(encoded);
+        this.encodedIterator = new StringCharacterIterator(encoded);
         this.encodedString = encoded;
         this.lineNumber = lineNumber;
     }
 
-    public String decode() throws DeserializeException {
-        while(encoded.current() != CharacterIterator.DONE){
-            if (encoded.current() == '\\') {
-                readDirective();
-            } else {
-                decoded.append(encoded.current());
-            }
-            encoded.next();
+    public String decode() throws DeserializeException{
+        int nextBackslash = 0;
+        while( (nextBackslash  = encodedString.indexOf('\\', encodedIterator.getIndex())) > -1 ){
+            decoded.append(encodedString, encodedIterator.getIndex(), nextBackslash);
+            encodedIterator.setIndex(nextBackslash);
+            readDirective();
+            encodedIterator.next();
         }
+        decoded.append(encodedString, encodedIterator.getIndex(), encodedString.length());
         return decoded.toString();
     }
 
     private void readDirective() throws DeserializeException {
-        switch (encoded.next()) {
+        switch (encodedIterator.next()) {
             case '\\':
                 decoded.append('\\'); break;
             case 'S':
@@ -62,25 +61,25 @@ public class StringDecoder {
     }
 
     private void readPageDirective() throws DeserializeException {
-        if(encoded.next()!='\\'){
+        if(encodedIterator.next()!='\\'){
             throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, "\\S directive not closed with \\");
         }
-        ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (encoded.next() + 128) });
+        ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (encodedIterator.next() + 128) });
         decoded.append(Charset.forName(alphabet).decode(b));
     }
 
     private void readAlphabetDirective() throws DeserializeException {
-        alphabet = alphabets.get(encoded.next());
+        alphabet = alphabets.get(encodedIterator.next());
         if(alphabet == null){
             throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, "\\P invalid identifier in alphabet directive");
         }
-        if(encoded.next()!='\\'){
+        if(encodedIterator.next()!='\\'){
             throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, "\\P alphabet directive not closed with \\");
         }
     }
 
     private void readHexDirective() throws DeserializeException {
-        switch(encoded.next()){
+        switch(encodedIterator.next()){
             case '2':
                 readHex2Directive();
                 break;
@@ -96,16 +95,16 @@ public class StringDecoder {
     }
 
     private void readHexArbitrary() {
-        int code = Integer.parseInt(new String(new char[]{ encoded.next(), encoded.next() }), 16);
+        int code = Integer.parseInt(new String(new char[]{ encodedIterator.next(), encodedIterator.next() }), 16);
         ByteBuffer b = ByteBuffer.wrap(new byte[] { (byte) (code) });
         decoded.append(Charsets.ISO_8859_1.decode(b));
     }
 
     private void readHex2Directive() throws DeserializeException {
-        if ( encoded.next() != '\\'){
+        if ( encodedIterator.next() != '\\'){
             throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, "\\X2 directive not closed with \\");
         }
-        int index = encoded.getIndex()+1;
+        int index = encodedIterator.getIndex()+1;
         int indexOfEnd = encodedString.indexOf("\\X0\\", index);
         if (indexOfEnd == -1) {
             throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_X4_NOT_CLOSED_WITH_X0, lineNumber, "\\X4\\ not closed with \\X0\\");
@@ -119,14 +118,14 @@ public class StringDecoder {
         } catch (DecoderException e) {
             throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_CHARACTER_DECODING_EXCEPTION, lineNumber, e);
         }
-        encoded.setIndex(indexOfEnd+3);
+        encodedIterator.setIndex(indexOfEnd+3);
     }
 
     private void readHex4Directive() throws DeserializeException {
-        if ( encoded.next() != '\\'){
+        if ( encodedIterator.next() != '\\'){
             throw new DeserializeException(DeserializerErrorCode.UNKNOWN_DESERIALIZER_ERROR, lineNumber, "\\X4 directive not closed with \\");
         }
-        int index = encoded.getIndex()+1;
+        int index = encodedIterator.getIndex()+1;
         int indexOfEnd = encodedString.indexOf("\\X0\\", index);
         if (indexOfEnd == -1) {
             throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_X4_NOT_CLOSED_WITH_X0, lineNumber, "\\X4\\ not closed with \\X0\\");
@@ -142,19 +141,35 @@ public class StringDecoder {
         } catch (UnsupportedCharsetException e) {
             throw new DeserializeException(DeserializerErrorCode.STRING_ENCODING_UTF32_NOT_SUPPORTED_ON_SYSTEM, lineNumber, "UTF-32 is not supported on your system", e);
         }
-        encoded.setIndex(indexOfEnd+3);
+        encodedIterator.setIndex(indexOfEnd+3);
     }
 
 }
 /*
+String grammar from ISO 10303-21
+
+LATIN_CODEPOINT   = SPACE | DIGIT | LOWER | UPPER | SPECIAL | REVERSE_SOLIDUS | APOSTROPHE.
+STRING            = "'" { SPECIAL | DIGIT | SPACE | LOWER | UPPER | HIGH_CODEPOINT | APOSTROPHE APOSTROPHE | REVERSE_SOLIDUS REVERSE_SOLIDUS | CONTROL_DIRECTIVE } "'" .
+CONTROL_DIRECTIVE = PAGE | ALPHABET | EXTENDED2 | EXTENDED4 | ARBITRARY .
+PAGE              = REVERSE_SOLIDUS "S" REVERSE_SOLIDUS LATIN_CODEPOINT .
+ALPHABET          = REVERSE_SOLIDUS "P" UPPER REVERSE_SOLIDUS .
+EXTENDED2         = REVERSE_SOLIDUS "X2" REVERSE_SOLIDUS HEX_TWO { HEX_TWO } END_EXTENDED .
+EXTENDED4         = REVERSE_SOLIDUS "X4" REVERSE_SOLIDUS HEX_FOUR { HEX_FOUR } END_EXTENDED .
+END_EXTENDED      = REVERSE_SOLIDUS "X0" REVERSE_SOLIDUS .
+ARBITRARY         = REVERSE_SOLIDUS "X" REVERSE_SOLIDUS HEX_ONE .
+
 Refactored grammar to remove first-first conflicts
 
-BS = REVERSE_SOLIDUS {PAGE0 | ALPHABET0 | EXTENDED2X | EXTENDED4X | ARBITRYX }.
-BSX = "X" { EXTENDED2X0 | EXTENDED4X0 | ARBITRARYX0 }.
-EXTENDED2X0 = "2" REVERSE_SOLIDUS HEX_TWO { HEX_TWO } END_EXTENDED .
-EXTENDED4X0 = "4" REVERSE_SOLIDUS HEX_FOUR { HEX_FOUR } END_EXTENDED .
-ARBITRARYX0 = REVERSE_SOLIDUS HEX_ONE .
-PAGE0 = "S" REVERSE_SOLIDUS LATIN_CODEPOINT .
-ALPHABET0 = "P" UPPER REVERSE_SOLIDUS .
+STRING        =  "'" { NON_RS | RS } "'" .
+NON_RS        = SPECIAL | DIGIT | SPACE | LOWER | UPPER | HIGH_CODEPOINT | APOSTROPHE APOSTROPHE .
+RS            = REVERSE_SOLIDUS RS_OR_CONTROL .
+RS_OR_CONTROL = REVERSE_SOLIDUS | PAGE0 | ALPHABET0 | UNICODE0 .
+PAGE0         = "S" REVERSE_SOLIDUS LATIN_CODEPOINT .
+ALPHABET0     = "P" UPPER REVERSE_SOLIDUS .
+UNICODE0      = "X" UNICODE1.
+UNICODE1      = ARBITRARY0 | EXTENDED20 | EXTENDED40 .
+ARBITRARY0    = REVERSE_SOLIDUS HEX_ONE .
+EXTENDED20    = "2" REVERSE_SOLIDUS HEX_TWO { HEX_TWO } END_EXTENDED .
+EXTENDED40    = "4" REVERSE_SOLIDUS HEX_FOUR { HEX_FOUR } END_EXTENDED .
  */
 
