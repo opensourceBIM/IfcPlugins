@@ -20,7 +20,7 @@ public class StringDecoder {
         }
     }
     private String alphabet;
-    private final StringBuffer decoded = new StringBuffer();
+    private final StringBuilder decoded = new StringBuilder();
     private final String encoded;
     private int pos = 0;
     private final int end;
