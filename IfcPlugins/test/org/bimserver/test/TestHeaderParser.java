@@ -30,7 +30,7 @@ public class TestHeaderParser {
 	@Test
 	public void test1() {
 		try {
-			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName("('\\\\alpha\\macvol\\Projects\\2006\\06006 18 - 40 Mount St\\11.0 CAD\\11.20 Data Exchange\\Sent out\\IFC''s\\090320\\A.BIM.P-090320.ifc','2009-03-20T16:36:54',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
+			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName("('\\\\alpha\\\\macvol\\\\Projects\\\\2006\\\\06006 18 - 40 Mount St\\\\11.0 CAD\\\\11.20 Data Exchange\\\\Sent out\\\\IFC''s\\\\090320\\\\A.BIM.P-090320.ifc','2009-03-20T16:36:54',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
 			
 			Assert.assertEquals("\\alpha\\macvol\\Projects\\2006\\06006 18 - 40 Mount St\\11.0 CAD\\11.20 Data Exchange\\Sent out\\IFC's\\090320\\A.BIM.P-090320.ifc", ifcHeader.getFilename());
 
@@ -152,7 +152,7 @@ public class TestHeaderParser {
 	@Test
 	public void test5() {
 		try {
-			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName("('G:\\Users\\NLST\\ArchiCAD\\2x.ifc','2006-02-16T17:26:18',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
+			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName("('G:\\\\Users\\\\NLST\\\\ArchiCAD\\\\2x.ifc','2006-02-16T17:26:18',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
 			
 			Assert.assertEquals("G:\\Users\\NLST\\ArchiCAD\\2x.ifc", ifcHeader.getFilename());
 
@@ -238,7 +238,7 @@ public class TestHeaderParser {
 	public void test10() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName(
-					"('Y:\\IFC\\IFC Certification\\IFC2x3 ADT Files\\Ready for IAI\\01-01-03-Clipping-ADT.ifc','2006-12-12T10:07:32',('Autodesk Inc.'),('Autodesk Inc.',''),'AutoCAD Architecture Kiasma Build 17.1.40.0 - 1.0','Microsoft Windows NT 5.1.2600 Service Pack 2','')", 0);
+					"('Y:\\\\IFC\\\\IFC Certification\\\\IFC2x3 ADT Files\\\\Ready for IAI\\\\01-01-03-Clipping-ADT.ifc','2006-12-12T10:07:32',('Autodesk Inc.'),('Autodesk Inc.',''),'AutoCAD Architecture Kiasma Build 17.1.40.0 - 1.0','Microsoft Windows NT 5.1.2600 Service Pack 2','')", 0);
 			
 			Assert.assertEquals("Y:\\IFC\\IFC Certification\\IFC2x3 ADT Files\\Ready for IAI\\01-01-03-Clipping-ADT.ifc", ifcHeader.getFilename());
 
@@ -271,7 +271,7 @@ public class TestHeaderParser {
 	public void test11() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName(
-					"('C:\\documents and settings\\stephj1\\my documents\\briefcases\\ifc-mbomb\\ifc-mbomb_t416\\t-block\\Views\\003-T-Block.dwg','2004-01-26T14:03:27',(''),('Taylor Woodrow'),'IFC-Utility 2x for ADT V. 2, 0, 2, 5   (www.inopso.com) - IFC Toolbox Version 2.x (00/11/07)','Autodesk Architectural Desktop','JS')", 0);
+					"('C:\\\\documents and settings\\\\stephj1\\\\my documents\\\\briefcases\\\\ifc-mbomb\\\\ifc-mbomb_t416\\\\t-block\\\\Views\\\\003-T-Block.dwg','2004-01-26T14:03:27',(''),('Taylor Woodrow'),'IFC-Utility 2x for ADT V. 2, 0, 2, 5   (www.inopso.com) - IFC Toolbox Version 2.x (00/11/07)','Autodesk Architectural Desktop','JS')", 0);
 			
 			Assert.assertEquals("C:\\documents and settings\\stephj1\\my documents\\briefcases\\ifc-mbomb\\ifc-mbomb_t416\\t-block\\Views\\003-T-Block.dwg", ifcHeader.getFilename());
 
@@ -302,7 +302,7 @@ public class TestHeaderParser {
 	public void test12() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName(
-					"('C:\\IFC\\IFC Certification\\IFC2x3 ADT Files\\Ready for IAI\\00-01-01-BasicSpaces-ADT-fix1.ifc','2006-12-14T10:55:37',('Autodesk Inc.'),('Autodesk Inc.',''),'AutoCAD Architecture Kiasma Build 17.1.40.0 - 1.0','Microsoft Windows NT 5.1.2600 Service Pack 2','')", 0);
+					"('C:\\\\IFC\\\\IFC Certification\\\\IFC2x3 ADT Files\\\\Ready for IAI\\\\00-01-01-BasicSpaces-ADT-fix1.ifc','2006-12-14T10:55:37',('Autodesk Inc.'),('Autodesk Inc.',''),'AutoCAD Architecture Kiasma Build 17.1.40.0 - 1.0','Microsoft Windows NT 5.1.2600 Service Pack 2','')", 0);
 
 			Assert.assertEquals("C:\\IFC\\IFC Certification\\IFC2x3 ADT Files\\Ready for IAI\\00-01-01-BasicSpaces-ADT-fix1.ifc", ifcHeader.getFilename());
 
@@ -379,7 +379,7 @@ public class TestHeaderParser {
 	public void test15() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName(
-					"('S:\\[IFC]\\COMPLETE-BUILDINGS\\FZK-MODELS\\Buerogebaeude-Zones\\ArchiCAD-11\\Institute-Var-2\\IFC2x3\\AC11-Institute-Var-2-IFC.ifc','2008-07-03T15:22:43',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
+					"('S:\\\\[IFC]\\\\COMPLETE-BUILDINGS\\\\FZK-MODELS\\\\Buerogebaeude-Zones\\\\ArchiCAD-11\\\\Institute-Var-2\\\\IFC2x3\\\\AC11-Institute-Var-2-IFC.ifc','2008-07-03T15:22:43',('Architect'),('Building Designer Office'),'PreProc - EDM 4.5.0033','Windows System','The authorising person')", 0);
 			
 			Assert.assertEquals("S:\\[IFC]\\COMPLETE-BUILDINGS\\FZK-MODELS\\Buerogebaeude-Zones\\ArchiCAD-11\\Institute-Var-2\\IFC2x3\\AC11-Institute-Var-2-IFC.ifc", ifcHeader.getFilename());
 
@@ -410,7 +410,7 @@ public class TestHeaderParser {
 	public void test16() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName(
-					"('V:\\R\\S\\E\\S\\/zn\\S\\C\\S\\)\\\\Proteo\\\\Nuselsk\\S\\C\\S\\= most BIM.14003\\\\Pracovn\\S\\C\\S\\-\\\\Martin\\\\IFC test\\\\6\\\\mal\\S\\C\\S\\= model - fid jako ifc tag NAME.ifc','2014-10-13T12:28:40',('Architect'),('Building Designer Office'),'PreProc - EDM 5.0','IFC file generated by Graphisoft ArchiCAD-64 17.0.0 CZE FULL Windows version (IFC2x3 add-on version: 6004 CZE FULL).','The authorising person')", 0);
+					"('V:\\\\R\\S\\E\\S\\/zn\\S\\C\\S\\)\\\\Proteo\\\\Nuselsk\\S\\C\\S\\= most BIM.14003\\\\Pracovn\\S\\C\\S\\-\\\\Martin\\\\IFC test\\\\6\\\\mal\\S\\C\\S\\= model - fid jako ifc tag NAME.ifc','2014-10-13T12:28:40',('Architect'),('Building Designer Office'),'PreProc - EDM 5.0','IFC file generated by Graphisoft ArchiCAD-64 17.0.0 CZE FULL Windows version (IFC2x3 add-on version: 6004 CZE FULL).','The authorising person')", 0);
 			
 			Assert.assertEquals("V:\\RÅ¯znÃ©\\Proteo\\NuselskÃ½ most BIM.14003\\PracovnÃ­\\Martin\\IFC test\\6\\malÃ½ model - fid jako ifc tag NAME.ifc", ifcHeader.getFilename());
 
