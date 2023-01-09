@@ -28,7 +28,6 @@
   <scm>
     <connection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</connection>
     <developerConnection>scm:git:https://github.com/opensourceBIM/IfcPlugins.git</developerConnection>
-    <tag>ifcplugins-0.0.32</tag>
     <url>https://github.com/opensourceBIM/IfcPlugins.git</url>
   </scm>
   <issueManagement>
@@ -41,9 +40,8 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
     <snapshotRepository>
-      <id>archiva.snapshots</id>
-      <name>Internal Snapshot Repository</name>
-      <url>${snapshotsrepo}/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
   <properties>
@@ -55,7 +53,7 @@
     <dependency>
       <groupId>org.opensourcebim</groupId>
       <artifactId>shared</artifactId>
-      <version>1.5.183-SNAPSHOT</version>
+      <version>1.5.183</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -134,7 +132,7 @@
         <configuration>
           <serverId>ossrh</serverId>
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
           <stagingProgressTimeoutMinutes>60</stagingProgressTimeoutMinutes>
         </configuration>
       </plugin>
@@ -142,10 +140,6 @@
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5.3</version>
         <configuration>
-          <project.scm.id>github.com</project.scm.id>
-          <checkModificationExcludes>
-            <checkModificationExclude>IfcPlugins/pom.xml</checkModificationExclude>
-          </checkModificationExcludes>
           <useReleaseProfile>false</useReleaseProfile>
           <releaseProfiles>release</releaseProfiles>
           <goals>deploy</goals>
@@ -173,6 +167,8 @@
                     <arg>--pinentry-mode</arg>
                     <arg>loopback</arg>
                   </gpgArguments>
+                  <keyname>${gpg.keyname}</keyname>
+                  <passphraseServerId>${gpg.keyname}</passphraseServerId>
                 </configuration>
               </execution>
             </executions>
