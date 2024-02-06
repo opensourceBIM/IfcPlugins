@@ -1,6 +1,4 @@
-package org.bimserver.deserializers;
-
-import java.util.HashSet;
+package org.bimserver.ifc.step.deserializer;
 
 /******************************************************************************
  * Copyright (C) 2009-2019  BIMserver.org
@@ -19,48 +17,22 @@ import java.util.HashSet;
  * along with this program.  If not, see {@literal<http://www.gnu.org/licenses/>}.
  *****************************************************************************/
 
+import java.util.Collections;
 import java.util.Set;
 
 import org.bimserver.emf.Schema;
-import org.bimserver.models.store.ObjectDefinition;
 import org.bimserver.plugins.PluginConfiguration;
-import org.bimserver.plugins.PluginContext;
-import org.bimserver.plugins.deserializers.Deserializer;
-import org.bimserver.plugins.deserializers.DeserializerPlugin;
-import org.bimserver.shared.exceptions.PluginException;
+import org.bimserver.plugins.deserializers.StreamingDeserializer;
 
-public class JsonDeserializerPlugin implements DeserializerPlugin {
+public class Ifc4x3StepStreamingDeserializerPlugin extends IfcStepStreamingDeserializerPlugin {
 
 	@Override
-	public void init(PluginContext pluginContext, PluginConfiguration systemSettings) throws PluginException {
-	}
-
-	@Override
-	public ObjectDefinition getUserSettingsDefinition() {
-		return null;
-	}
-	
-	@Override
-	public ObjectDefinition getSystemSettingsDefinition() {
-		return null;
-	}
-
-	@Override
-	public Deserializer createDeserializer(PluginConfiguration pluginConfiguration) {
-		return new JsonDeserializer();
-	}
-
-	@Override
-	public boolean canHandleExtension(String extension) {
-		return extension.equals("json");
+	public StreamingDeserializer createDeserializer(PluginConfiguration pluginConfiguration) {
+		return new Ifc4x3StepStreamingDeserializer();
 	}
 
 	@Override
 	public Set<Schema> getSupportedSchemas() {
-		Set<Schema> set = new HashSet<>();
-		set.add(Schema.IFC2X3TC1);
-		set.add(Schema.IFC4);
-		set.add(Schema.IFC4X3);
-		return set;
+		return Collections.singleton(Schema.IFC4);
 	}
 }

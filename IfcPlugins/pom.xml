@@ -41,7 +41,7 @@
     </repository>
     <snapshotRepository>
       <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>${snapshotsrepo}/</url>
     </snapshotRepository>
   </distributionManagement>
   <properties>

@@ -42,6 +42,7 @@ public class JsonStreamingDeserializerPlugin implements StreamingDeserializerPlu
 		Set<Schema> set = new HashSet<>();
 		set.add(Schema.IFC2X3TC1);
 		set.add(Schema.IFC4);
+		set.add(Schema.IFC4X3);
 		return set;
 	}
 }

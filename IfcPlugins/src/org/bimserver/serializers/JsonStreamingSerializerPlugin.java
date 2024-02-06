@@ -93,6 +93,7 @@ public class JsonStreamingSerializerPlugin implements StreamingSerializerPlugin 
 		Set<Schema> schemas = new HashSet<>();
 		schemas.add(Schema.IFC2X3TC1);
 		schemas.add(Schema.IFC4);
+		schemas.add(Schema.IFC4X3);
 		return schemas;
 	}
 

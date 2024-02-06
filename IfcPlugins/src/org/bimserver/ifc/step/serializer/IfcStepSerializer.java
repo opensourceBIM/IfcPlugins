@@ -134,7 +134,7 @@ public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSeri
 		IfcHeader ifcHeader = getModel().getModelMetaData().getIfcHeader();
 		if (ifcHeader == null) {
 			Date date = new Date();
-			println("FILE_DESCRIPTION ((''), '2;1');");
+			println("FILE_DESCRIPTION (('ViewDefinition[CoordinationView]'), '2;1');");
 			println("FILE_NAME ('', '" + dateFormatter.format(date) + "', (''), (''), '', 'BIMserver', '');");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
 		} else {
