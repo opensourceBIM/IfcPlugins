@@ -25,16 +25,22 @@
 		<name>Ifc2x3tc1</name>
 	</JavaPlugin>
 	<JavaPlugin>
-		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.ifc.step.serializer.Ifc4StepSerializerPlugin</implementationClass>
-		<description>Ifc4 Serializer</description>
-		<name>Ifc4</name>
-	</JavaPlugin>
-	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.ifc.step.serializer.Ifc2x3tc1StepStreamingSerializerPlugin</implementationClass>
 		<description>Ifc2x3tc1 Streaming Serializer</description>
 		<name>Ifc2x3tc1 (Streaming)</name>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.deserializers.StreamingDeserializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc2x3tc1StepStreamingDeserializerPlugin</implementationClass>
+		<description>Ifc2x3tc1 Step Streaming Deserializer</description>
+		<name>Ifc2x3tc1 (Streaming)</name>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifc.step.serializer.Ifc4StepSerializerPlugin</implementationClass>
+		<description>Ifc4 Serializer</description>
+		<name>Ifc4</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
@@ -49,10 +55,22 @@
 		<name>Ifc4 (Streaming)</name>
 	</JavaPlugin>
 	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifc.step.serializer.Ifc4x3StepSerializerPlugin</implementationClass>
+		<description>Ifc4x3 Serializer</description>
+		<name>Ifc4x3</name>
+	</JavaPlugin>
+	<JavaPlugin>
+		<interfaceClass>org.bimserver.plugins.serializers.StreamingSerializerPlugin</interfaceClass>
+		<implementationClass>org.bimserver.ifc.step.serializer.Ifc4x3StepStreamingSerializerPlugin</implementationClass>
+		<description>Ifc4 Streaming Serializer</description>
+		<name>Ifc4x3 (Streaming)</name>
+	</JavaPlugin>
+	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.deserializers.StreamingDeserializerPlugin</interfaceClass>
-		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc2x3tc1StepStreamingDeserializerPlugin</implementationClass>
-		<description>Ifc2x3tc1 Step Streaming Deserializer</description>
-		<name>Ifc2x3tc1 (Streaming)</name>
+		<implementationClass>org.bimserver.ifc.step.deserializer.Ifc4x3StepStreamingDeserializerPlugin</implementationClass>
+		<description>Ifc4x3 Step Streaming Deserializer</description>
+		<name>Ifc4x3 (Streaming)</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.modelcompare.ModelComparePlugin</interfaceClass>

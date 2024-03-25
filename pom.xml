@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opensourcebim</groupId>
   <artifactId>ifcplugins</artifactId>
-  <version>0.0.102-SNAPSHOT</version>
+  <version>0.0.103-SNAPSHOT</version>
   <name>IfcPlugins</name>
   <description>BIMserver plugin that provides IFC serializers/deserializers</description>
   <url>https://github.com/opensourceBIM/IfcPlugins/BIMserver</url>
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.opensourcebim</groupId>
       <artifactId>shared</artifactId>
-      <version>1.5.185-SNAPSHOT</version>
+      <version>1.5.186-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -74,13 +74,13 @@
     </repository>
   </repositories>
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
+    <sourceDirectory>IfcPlugins/src</sourceDirectory>
+    <testSourceDirectory>IfcPlugins/test</testSourceDirectory>
     <resources>
       <resource>
         <targetPath>plugin</targetPath>
         <filtering>true</filtering>
-        <directory>plugin</directory>
+        <directory>IfcPlugins/plugin</directory>
       </resource>
     </resources>
     <plugins>
@@ -97,12 +97,12 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>plugin/plugin.xml</file>
+                  <file>${project.build.outputDirectory}/plugin/plugin.xml</file>
                   <type>xml</type>
                   <classifier>plugin</classifier>
                 </artifact>
                 <artifact>
-                  <file>plugin/icon.png</file>
+                  <file>${project.build.outputDirectory}/plugin/icon.png</file>
                   <type>png</type>
                   <classifier>icon</classifier>
                 </artifact>

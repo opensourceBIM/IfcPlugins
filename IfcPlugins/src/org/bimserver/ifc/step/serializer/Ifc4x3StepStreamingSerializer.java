@@ -33,7 +33,7 @@ public class Ifc4x3StepStreamingSerializer extends IfcStepStreamingSerializer {
 	
 	@Override
 	public void init(ObjectProvider objectProvider, ProjectInfo projectInfo, IfcHeader ifcHeader, PluginManagerInterface pluginManager, PackageMetaData packageMetaData) throws SerializerException {
-		setHeaderSchema("IFC4X3");
+		setHeaderSchema("IFC4X3_ADD2");
 		super.init(objectProvider, projectInfo, ifcHeader, pluginManager, packageMetaData);
 	}
 }

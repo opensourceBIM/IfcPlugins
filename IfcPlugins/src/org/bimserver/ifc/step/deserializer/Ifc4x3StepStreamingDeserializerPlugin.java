@@ -33,6 +33,6 @@ public class Ifc4x3StepStreamingDeserializerPlugin extends IfcStepStreamingDeser
 
 	@Override
 	public Set<Schema> getSupportedSchemas() {
-		return Collections.singleton(Schema.IFC4);
+		return Schema.asSet(Schema.IFC4X3);
 	}
 }

@@ -30,7 +30,7 @@ public class Ifc4x3StepSerializer extends IfcStepSerializer {
 	
 	@Override
 	public void init(IfcModelInterface model, ProjectInfo projectInfo, boolean normalizeOids) throws SerializerException {
-		setHeaderSchema("IFC4X3");
+		setHeaderSchema("IFC4X3_ADD2");
 		super.init(model, projectInfo, normalizeOids);
 	}
 }

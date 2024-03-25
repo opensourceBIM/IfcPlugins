@@ -38,7 +38,7 @@ public class Ifc4x3StepDeserializerPlugin extends IfcStepDeserializerPlugin {
 	@Override
 	public Set<Schema> getSupportedSchemas() {
 		Set<Schema> set = new HashSet<>();
-    set.add(Schema.IFC4X3);
+    	set.add(Schema.IFC4X3);
 		return set;
 	}
 }
