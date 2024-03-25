@@ -60,7 +60,7 @@ public class JsonSerializerPlugin extends AbstractSerializerPlugin {
 	
 	@Override
 	public Set<Schema> getSupportedSchemas() {
-		return Schema.asSet(Schema.IFC2X3TC1, Schema.IFC4);
+		return Schema.asSet(Schema.IFC2X3TC1, Schema.IFC4, Schema.IFC4X3);
 	}
 
 	@Override
@@ -70,6 +70,8 @@ public class JsonSerializerPlugin extends AbstractSerializerPlugin {
 			return "IFC_JSON_2X3TC1";
 		case IFC4:
 			return "IFC_JSON_4";
+		case IFC4X3:
+			return "IFC_JSON_4X3";
 		default:
 			return null;
 		}

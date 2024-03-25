@@ -134,7 +134,7 @@ public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSeri
 		IfcHeader ifcHeader = getModel().getModelMetaData().getIfcHeader();
 		if (ifcHeader == null) {
 			Date date = new Date();
-			println("FILE_DESCRIPTION ((''), '2;1');");
+			println("FILE_DESCRIPTION (('ViewDefinition[CoordinationView]'), '2;1');");
 			println("FILE_NAME ('', '" + dateFormatter.format(date) + "', (''), (''), '', 'BIMserver', '');");
 			println("FILE_SCHEMA (('" + headerSchema + "'));");
 		} else {
@@ -187,7 +187,7 @@ public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSeri
 		boolean isFirst = true;
 		EntityDefinition entityBN = getPackageMetaData().getSchemaDefinition().getEntityBN(object.eClass().getName());
 		for (EStructuralFeature feature : eClass.getEAllStructuralFeatures()) {
-			if (feature.getEAnnotation("hidden") == null && (entityBN != null && (!entityBN.isDerived(feature.getName()) || entityBN.isDerivedOverride(feature.getName())))) {
+			if (getPackageMetaData().useForSerialization(eClass, feature)) {
 				EClassifier type = feature.getEType();
 				if (type instanceof EEnum) {
 					if (!isFirst) {
@@ -324,7 +324,7 @@ public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSeri
 			if (!feature.isUnsettable()) {
 				print(OPEN_CLOSE_PAREN);
 			} else {
-				print("$");
+				print(DOLLAR);
 			}
 		} else {
 			print(OPEN_PAREN);
@@ -433,7 +433,7 @@ public class IfcStepSerializer extends IfcSerializer implements HeaderTakingSeri
 				if (!feature.isUnsettable()) {
 					print(OPEN_CLOSE_PAREN);
 				} else {
-					print("$");
+					print(DOLLAR);
 				}
 			} else {
 				print(OPEN_PAREN);

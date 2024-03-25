@@ -45,6 +45,11 @@ import com.google.common.base.Charsets;
 public class IfcParserWriterUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(IfcParserWriterUtils.class);
 	private static final boolean USE_ISO_8859_1 = false;
+	
+	private static final ParserPlan[] plans = new ParserPlan[]{
+		new ParserPlan(new XPass(), new X2Pass(), new X4Pass(), new SPass()),
+		new ParserPlan(new SPass(), new XPass(), new X2Pass(), new X4Pass())
+	};
 
 	public static Object convertSimpleValue(PackageMetaData packageMetaData, EStructuralFeature eStructuralFeature, Class<?> instanceClass, String value, long lineNumber) throws DeserializeException {
 		if (!value.equals("")) {
