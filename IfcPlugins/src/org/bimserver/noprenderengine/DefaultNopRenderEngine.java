@@ -52,7 +52,6 @@ public class DefaultNopRenderEngine implements RenderEnginePlugin {
 
 	@Override
 	public VersionInfo getVersionInfo() {
-		VersionInfo versionInfo = new VersionInfo("nop", "nop", "nop", new GregorianCalendar(), "nop");
-		return versionInfo;
+		return new VersionInfo("nop", "nop", new GregorianCalendar(), "nop");
 	}
 }
