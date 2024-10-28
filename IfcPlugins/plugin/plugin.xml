@@ -16,7 +16,7 @@
 		<interfaceClass>org.bimserver.plugins.deserializers.StreamingDeserializerPlugin</interfaceClass>
 		<implementationClass>org.bimserver.deserializers.JsonStreamingDeserializerPlugin</implementationClass>
 		<description>JsonStreamingDeserializerPlugin</description>
-		<name>Json</name>
+		<name>Json (Streaming)</name>
 	</JavaPlugin>
 	<JavaPlugin>
 		<interfaceClass>org.bimserver.plugins.serializers.SerializerPlugin</interfaceClass>
