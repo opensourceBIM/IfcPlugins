@@ -381,26 +381,31 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 							throw new DeserializeException(DeserializerErrorCode.EXPECTED_CHARACTER_BUT_EMPTY_FIELD, lineNumber, "Expected non-comma character, but field value length is 0");
 						}
 						char firstChar = val.charAt(0);
-						if (firstChar == '$') {
-							object.eUnset(eStructuralFeature);
-							if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
-								EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
-								object.eUnset(doubleStringFeature);
+
+						if (eStructuralFeature.isMany()) {
+							if (firstChar == '(') {
+								if (!readList(val,(ListCapableVirtualObject) object, eStructuralFeature, object,-1 )) {
+									openReferences = true;
+								}
+							} else if (firstChar == '$') {
+								unsetFeature(object, eStructuralFeature, eClass);
+							} else {
+								throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " is aggregation");
 							}
-						} else if (firstChar == '#') {
-							if (!readReference(val, object, eStructuralFeature)) {
-								openReferences = true;
-							}
-						} else if (firstChar == '.') {
-							readEnum(val, object, (EAttribute) eStructuralFeature);
-						} else if (firstChar == '(') {
-							if (!readList(val, (ListCapableVirtualObject) object, eStructuralFeature, object, -1)) {
-								openReferences = true;
-							}
-						} else if (firstChar == '*') {
-							object.eUnset(eStructuralFeature);
 						} else {
-							if (!eStructuralFeature.isMany()) {
+							if (firstChar == '$') {
+								unsetFeature(object, eStructuralFeature, eClass);
+							} else if (firstChar == '#') {
+								if (!readReference(val, object, eStructuralFeature)) {
+									openReferences = true;
+								}
+							} else if (firstChar == '.') {
+								readEnum(val, object, (EAttribute) eStructuralFeature);
+							} else if (firstChar == '*') {
+								object.eUnset(eStructuralFeature);
+							} else if (firstChar == '(') {
+								throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " is no aggregation");
+							} else {
 								Object converted = convert(eStructuralFeature, eStructuralFeature.getEType(), val);
 								if (eStructuralFeature.getName().equals("GlobalId")) {
 									processGuid(object, eStructuralFeature, converted);
@@ -415,9 +420,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 									EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
 									object.setAttribute((EAttribute) doubleStringFeature, val);
 								}
-							} else {
-								// It's not a list in the file, but it is in the
-								// schema??
 							}
 						}
 					} else {
@@ -446,6 +448,14 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 				int nrBytes = getDatabaseInterface().save(object);
 				metricCollector.collect(line.length(), nrBytes);
 			}
+		}
+	}
+
+	private void unsetFeature(VirtualObject object, EStructuralFeature eStructuralFeature, EClass eClass) throws BimserverDatabaseException {
+		object.eUnset(eStructuralFeature);
+		if (eStructuralFeature.getEType() == EcorePackage.eINSTANCE.getEDouble()) {
+			EStructuralFeature doubleStringFeature = eClass.getEStructuralFeature(eStructuralFeature.getName() + "AsString");
+			object.eUnset(doubleStringFeature);
 		}
 	}
 
