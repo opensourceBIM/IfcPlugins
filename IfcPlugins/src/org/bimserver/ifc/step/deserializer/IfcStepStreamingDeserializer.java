@@ -382,19 +382,19 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 						}
 						char firstChar = val.charAt(0);
 
-						if (eStructuralFeature.isMany()) {
+						if (firstChar == '$') {
+							unsetFeature(object, eStructuralFeature, eClass);
+						} else if (eStructuralFeature.isMany()) {
 							if (firstChar == '(') {
 								if (!readList(val,(ListCapableVirtualObject) object, eStructuralFeature, object,-1 )) {
 									openReferences = true;
 								}
-							} else if (firstChar == '$') {
-								unsetFeature(object, eStructuralFeature, eClass);
 							} else {
-								throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " is aggregation");
+								throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " - expected aggregation, but found simple type.");
 							}
 						} else {
-							if (firstChar == '$') {
-								unsetFeature(object, eStructuralFeature, eClass);
+						 	if (firstChar == '(') {
+								 throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " - expected simple type, but found aggregation.");
 							} else if (firstChar == '#') {
 								if (!readReference(val, object, eStructuralFeature)) {
 									openReferences = true;
@@ -403,8 +403,6 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 								readEnum(val, object, (EAttribute) eStructuralFeature);
 							} else if (firstChar == '*') {
 								object.eUnset(eStructuralFeature);
-							} else if (firstChar == '(') {
-								throw new DeserializeException(DeserializerErrorCode.UNEXPECTED_AGGREGATION, lineNumber, "Field " + eStructuralFeature.getName() + " of " + object.eClass().getName() + " is no aggregation");
 							} else {
 								Object converted = convert(eStructuralFeature, eStructuralFeature.getEType(), val);
 								if (eStructuralFeature.getName().equals("GlobalId")) {
