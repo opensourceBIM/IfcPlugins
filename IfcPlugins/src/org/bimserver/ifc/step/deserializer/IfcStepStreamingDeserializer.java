@@ -181,7 +181,7 @@ public abstract class IfcStepStreamingDeserializer implements StreamingDeseriali
 	private long read(InputStream inputStream, long fileSize) throws DeserializeException {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charsets.UTF_8));
 		long bytesRead = 0;
-		lineNumber = 0;
+		lineNumber = 1;
 		try {
 			String line = reader.readLine();
 			if (line == null) {
