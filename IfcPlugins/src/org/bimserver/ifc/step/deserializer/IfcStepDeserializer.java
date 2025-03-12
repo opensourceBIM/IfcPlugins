@@ -138,7 +138,7 @@ public abstract class IfcStepDeserializer extends EmfDeserializer {
 		int initialCapacity = (int) (fileSize / AVERAGE_LINE_LENGTH);
 		model = new BasicIfcModel(getPackageMetaData(), null, initialCapacity);
 		long bytesRead = 0;
-		lineNumber = 0;
+		lineNumber = 1;
 		try {
 			String line = reader.readLine();
 			if (line == null) {
