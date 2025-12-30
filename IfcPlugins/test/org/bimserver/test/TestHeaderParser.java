@@ -120,7 +120,7 @@ public class TestHeaderParser {
 	public void test4() {
 		try {
 			IfcHeader ifcHeader = new IfcHeaderParser().parseFileName("($,'2013-05-02T10:04:35',(''),(''),'Autodesk Revit Architecture 2013','20120221_2030(x64)','')", 0);
-			
+
 			Assert.assertEquals(null, ifcHeader.getFilename());
 
 			GregorianCalendar gregorianCalendar = new GregorianCalendar();
@@ -142,6 +142,7 @@ public class TestHeaderParser {
 			Assert.assertEquals("", ifcHeader.getAuthorization());
 		} catch (DeserializeException e) {
 			e.printStackTrace();
+			// TODO this does not actually assert the exception (and it is not thrown anyway)
 			Assert.assertEquals("FILE_NAME.name is not an optional field, but $ used", e.getMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
